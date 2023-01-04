@@ -6,7 +6,7 @@ public interface StompMessagingProtocol<T>  {
 	/**
 	 * Used to initiate the current client protocol with it's personal connection ID and the connections implementation
 	**/
-    void start(int connectionId, Connections<T> connections);
+    // void start(int connectionId, Connections<T> connections);        //someone in the group said Hadi allowed to delete it
     
     void process(T message);
 	
