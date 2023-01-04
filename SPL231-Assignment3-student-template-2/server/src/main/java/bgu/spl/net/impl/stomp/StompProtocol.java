@@ -6,7 +6,10 @@ package bgu.spl.net.impl.stomp;
 
 import bgu.spl.net.api.StompMessagingProtocol;
 import bgu.spl.net.impl.newsfeed.NewsFeed;
+import bgu.spl.net.impl.rci.Command;
+import bgu.spl.net.srv.ConnectionsImpl;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 public class StompProtocol implements StompMessagingProtocol<String> {
@@ -23,9 +26,9 @@ public class StompProtocol implements StompMessagingProtocol<String> {
         ConnectionsDataStructure = CDS;
     }
     
-    public void process(String message){           //SMP interface method
-        //message PARSE method                  //TODO - method to parse the massage 
-        return ((Command) msg).execute(arg);        //TODO - 
+    public void process(Serializable  message){           //SMP interface method
+        //message PARSE() method                  //TODO - method to parse the massage 
+        return ((Command) message).execute(NewsDataStructure,ConnectionsDataStructure);        //TODO - change to fit XxxxxCommand.execute (as we designed)
     };
 	
 
@@ -37,6 +40,8 @@ public class StompProtocol implements StompMessagingProtocol<String> {
 
 
     /*
+ * EchoProtocol:
+ * 
  * 
  @Override
  public String process(String msg) {
