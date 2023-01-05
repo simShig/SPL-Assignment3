@@ -1,5 +1,6 @@
 /*
  * inspired by LineMessageEncoderDecoder
+ * the decoder will 'translate' the massage from bytes to string, but will not split and proccess!!!
  */
 
 package bgu.spl.net.impl.stomp;
