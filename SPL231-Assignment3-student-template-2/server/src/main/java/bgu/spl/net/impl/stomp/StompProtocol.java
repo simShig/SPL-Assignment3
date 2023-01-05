@@ -26,9 +26,9 @@ public class StompProtocol implements StompMessagingProtocol<String> {
         ConnectionsDataStructure = CDS;
     }
     
-    public void process(Serializable  message){           //SMP interface method
+    public void process(String  message){           //SMP interface method
         //message PARSE() method                  //TODO - method to parse the massage 
-        return ((Command) message).execute(NewsDataStructure,ConnectionsDataStructure);        //TODO - change to fit XxxxxCommand.execute (as we designed)
+        //return ((Command) message).execute(NewsDataStructure,ConnectionsDataStructure);        //TODO - change to fit XxxxxCommand.execute (as we designed)
     };
 	
 

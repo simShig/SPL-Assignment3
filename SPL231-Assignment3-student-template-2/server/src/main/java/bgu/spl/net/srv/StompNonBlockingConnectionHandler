@@ -1,0 +1,22 @@
+public class StompNonBlockingConnectionHandler<T> extends NonBlockingConnectionHandler<T> {
+//fields:
+public String AcceptVersion = "1.2"
+public String host = "stomp.cs.bgu.ac.il"
+public String login=null;
+public String password=null;
+
+//methods:
+public StompNonBlockingConnectionHandler(MessageEncoderDecoder<T> reader,MessagingProtocol<T> protocol,
+SocketChannel chan,Reactor reactor){
+    super(reader,protocol,chan,reactor)
+    //more fields of needed
+
+}
+
+
+@Override
+public void send(T msg) {
+    //TODO - IMPLEMENT NEEDED
+}
+
+}

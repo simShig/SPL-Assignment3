@@ -12,6 +12,10 @@ public class ConnectionsImpl implements Connections<String>{
 
     private ConcurrentHashMap<String, ConcurrentHashMap<ConnectionHandler<String>,Integer>> subscriptionsDB = new ConcurrentHashMap<>();//map<topic,map<CH,subscriptionID>
     
+    static int clientID;        //global (static)
+    static int recieptID;        //global (static)
+
+
     //TODO - Implement this class entirely - only implemented skelaton so i can referance Type ConnectionsImpl as a Type.
 
     //methods:
