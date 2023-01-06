@@ -18,23 +18,23 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
     private String EndOfLine = FrameFormat.EndOfLine;
     private String EndOfField = FrameFormat.EndOfField;
     private boolean shouldTerminate = false;
-    // private NewsFeed NewsDataStructure; 
-    // private ConnectionsImpl ConnectionsDataStructure;  
+    private NewsFeed NewsDataStructure; 
+    private ConnectionsImpl ConnectionsDataStructure;  
     
     // public void start(int connectionId, Connections<String> connections){   //someone in the group said Hadi allowed to delete it
     //     return;
     // };
     public StompProtocolImpl (NewsFeed NDS, ConnectionsImpl CDS){   //CONSTRUCTOR - inspired by RCIprotocol
-        // NewsDataStructure = NDS;
-        // ConnectionsDataStructure = CDS;
+        NewsDataStructure = NDS;
+        ConnectionsDataStructure = CDS;
     }
     
-    public void process(String  msg){           //SMP interface method
+    public String process(String  msg){           //SMP interface method
         //message PARSE() method                  //TODO - method to parse the massage 
         FrameFormat recievedFrame =string2Frame(msg);
         
 
-
+        return "something";
         //return ((Command) message).execute(NewsDataStructure,ConnectionsDataStructure);        //TODO - change to fit XxxxxCommand.execute (as we designed)
     };
 	
@@ -44,6 +44,10 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
         return shouldTerminate;
 
     };
+
+/*
+ * ~~~~~~~~~String2Frame2String:~~~~~~~~~~~~~~~~~~~:
+ */
 
 
     public FrameFormat string2Frame (String str){               //transforms msg back to frame
@@ -67,6 +71,7 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
         FrameFormat recievedFrame = new FrameFormat(sCommand, sHeaders, sBody);
         return recievedFrame;
     }
+
     public String frame2String (FrameFormat frame){
         String ans=null;
     //add commandHeader:
@@ -84,6 +89,11 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
         ans+=frame.EndOfMassage;
         return ans;
     }
+
+/*
+ * ~~~~~~~~~~~~Proccessing Commands (methods)~~~~~~~~~~~~~~~~
+ */
+
 
     /*
  * EchoProtocol:
