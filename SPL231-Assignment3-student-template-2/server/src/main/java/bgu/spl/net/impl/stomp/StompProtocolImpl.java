@@ -5,6 +5,7 @@ Based on the EchoProtocol and interface StompMassagingProtocol
 package bgu.spl.net.impl.stomp;
 
 import bgu.spl.net.api.StompMessagingProtocol;
+import bgu.spl.net.api.MessagingProtocol;
 import bgu.spl.net.impl.newsfeed.NewsFeed;
 import bgu.spl.net.impl.rci.Command;
 import bgu.spl.net.srv.ConnectionsImpl;
