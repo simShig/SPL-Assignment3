@@ -26,7 +26,7 @@ public interface Server<T> extends Closeable {
             int port,
             Supplier<StompMessagingProtocol<T>> protocolFactory,
             Supplier<StompEncoderDecoder > encoderDecoderFactory) {
-
+            System.out.println("TPC constructor finished");
         return new BaseServer<T>(port, protocolFactory, encoderDecoderFactory) {
           
           

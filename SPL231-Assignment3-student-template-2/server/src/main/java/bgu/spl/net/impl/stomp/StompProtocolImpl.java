@@ -33,13 +33,15 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
     
     public String process(String  msg){           //SMP interface method
         //message PARSE() method                  //TODO - method to parse the massage 
+        System.out.println("the massage proccessing now: "+msg);
         BlockingConnectionHandler<String> CH = null;    //the ConnectionHandler of the client from whom the massage is recieved.
         FrameFormat recievedFrame =string2Frame(msg);
         FrameFormat responseFrame = null;
         switch (recievedFrame.stompCommand){
             case ("SUBSCRIBE"):
-                 responseFrame = subscribeCMD(null, null, 0);
-                 break;
+            System.out.print("im in SUBSCRIBE case");    
+            //  responseFrame = subscribeCMD(null, null, 0);
+                //  break;
             case ("UNSUBSCRIBE"):
                  responseFrame = unsubscribeCMD(null,null,0);
                  break;
@@ -52,7 +54,9 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
             case ("SEND"):
                  responseFrame = sendCMD();
                  break;
-            default: responseFrame=new FrameFormat("ERROR", null, "your title is wrong")  ;//return ERROR
+            default:
+            System.out.print("im in Deafult case");    
+            //  responseFrame=new FrameFormat("ERROR", null, "your title is wrong")  ;//return ERROR
 
             
         }
@@ -62,7 +66,7 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
 	
 
     public boolean shouldTerminate(){           // SMP interface method
-        shouldTerminate = true;
+        //shouldTerminate = true;
         return shouldTerminate;
 
     };
@@ -78,6 +82,7 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
         String sCommand = splitByFields[0];
         //stompHeaders:
         LinkedList<LinkedList<String>> sHeaders = new LinkedList<>();
+        if (splitByFields.length!=3)  System.out.println("amount of fields is "+ splitByFields.length+", should be 3 (error im StompProtocolImpl::string2frame");
         String[] headersSplitByEOL = splitByFields[1].split(EndOfLine);
         for (int i = 1; i < headersSplitByEOL.length-1; i++) {
           String headerName = headersSplitByEOL[i].split(":")[0];

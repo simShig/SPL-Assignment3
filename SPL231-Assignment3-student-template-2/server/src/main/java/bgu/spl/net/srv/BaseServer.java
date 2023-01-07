@@ -26,6 +26,7 @@ public abstract class BaseServer<T> implements Server<T> {
         this.protocolFactory = protocolFactory;
         this.encdecFactory = encdecFactory;
 		this.sock = null;
+        System.out.println("BaseServer constructor finished");
     }
 
     @Override
@@ -37,15 +38,15 @@ public abstract class BaseServer<T> implements Server<T> {
             this.sock = serverSock; //just to be able to close
 
             while (!Thread.currentThread().isInterrupted()) {
-
+                System.out.println("entering WHILE INTERRUPTED loop");
                 Socket clientSock = serverSock.accept();
-                
+                System.out.println("executed clientSock=serverSock.accept");
 
                 BlockingConnectionHandler<T> handler = new BlockingConnectionHandler<>(
                         clientSock,
                         encdecFactory.get(),
                         protocolFactory.get());
-
+                        System.out.println("BlockingConnectionHandler constructor finished");
                 execute(handler);
             }
         } catch (IOException ex) {
