@@ -33,6 +33,9 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
     
     public String process(String  msg){           //SMP interface method
         //message PARSE() method                  //TODO - method to parse the massage 
+       
+       //something weird -when we get a massage it starts it with second char (miss the first one...)
+
         System.out.println("the massage proccessing now: "+msg);
         BlockingConnectionHandler<String> CH = null;    //the ConnectionHandler of the client from whom the massage is recieved.
         FrameFormat recievedFrame =string2Frame(msg);
@@ -100,6 +103,10 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
     }
 
     public String frame2String (FrameFormat frame){
+    if (frame==null){               //addad it after recieving null pointer exception 
+        System.out.print("no frame recieved (frame==null)");
+        return null;
+    }
         String ans=null;
     //add commandHeader:
         ans=ans+frame.stompCommand + EndOfField;
