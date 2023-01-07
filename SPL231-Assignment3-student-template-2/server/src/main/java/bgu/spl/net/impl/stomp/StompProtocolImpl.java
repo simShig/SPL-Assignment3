@@ -5,9 +5,10 @@ Based on the EchoProtocol and interface StompMassagingProtocol
 package bgu.spl.net.impl.stomp;
 
 import bgu.spl.net.api.StompMessagingProtocol;
-import bgu.spl.net.api.MessagingProtocol;
 import bgu.spl.net.impl.newsfeed.NewsFeed;
 import bgu.spl.net.impl.rci.Command;
+import bgu.spl.net.srv.BlockingConnectionHandler;
+import bgu.spl.net.srv.ConnectionHandler;
 import bgu.spl.net.srv.ConnectionsImpl;
 import java.util.LinkedList;
 
@@ -32,10 +33,30 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
     
     public String process(String  msg){           //SMP interface method
         //message PARSE() method                  //TODO - method to parse the massage 
+        BlockingConnectionHandler<String> CH = null;    //the ConnectionHandler of the client from whom the massage is recieved.
         FrameFormat recievedFrame =string2Frame(msg);
-        
+        FrameFormat responseFrame = null;
+        switch (recievedFrame.stompCommand){
+            case ("SUBSCRIBE"):
+                 responseFrame = subscribeCMD(null, null, 0);
+                 break;
+            case ("UNSUBSCRIBE"):
+                 responseFrame = unsubscribeCMD(null,null,0);
+                 break;
+            case ("CONNECT"):
+                 responseFrame = connectCMD(null);
+                 break;
+            case ("DISCONNECT"):
+                 responseFrame = disconnectCMD(null);
+                 break;
+            case ("SEND"):
+                 responseFrame = sendCMD();
+                 break;
+            default: responseFrame=new FrameFormat("ERROR", null, "your title is wrong")  ;//return ERROR
 
-        return "something";
+            
+        }
+        return frame2String(responseFrame);
         //return ((Command) message).execute(NewsDataStructure,ConnectionsDataStructure);        //TODO - change to fit XxxxxCommand.execute (as we designed)
     };
 	
@@ -95,26 +116,83 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
  * ~~~~~~~~~~~~Proccessing Commands (methods)~~~~~~~~~~~~~~~~
  */
 
+//SUBSCRIBE:
 
-    /*
- * EchoProtocol:
- * 
- * 
- @Override
- public String process(String msg) {
-     shouldTerminate = "bye".equals(msg);
-     System.out.println("[" + LocalDateTime.now() + "]: " + msg);
-     return createEcho(msg);
-    }
-    
-    private String createEcho(String message) {
-        String echoPart = message.substring(Math.max(message.length() - 2, 0), message.length());
-        return message + " .. " + echoPart + " .. " + echoPart + " ..";
-    }
-    
-    @Override
-    public boolean shouldTerminate() {
-        return shouldTerminate;
-    }
-    */
+private FrameFormat subscribeCMD (String topic, ConnectionHandler<String> CH,int subscriptionID ){
+    //add topic to CH (in connections):
+    ConnectionsDataStructure.addCHtoDB(CH);
+    //add CH to topic (in subscriptions):
+    ConnectionsDataStructure.addTopicToCH(CH, topic, subscriptionID);
+    //response if ok:
+
+    //response if error:
+
+    return new FrameFormat(EndOfLine, null, EndOfField);
 }
+
+private FrameFormat unsubscribeCMD (String topic, ConnectionHandler<String> CH,int subscriptionID ){
+    //remove CH from topic (in subscriptions) and remove topic from CH (in connections):
+    ConnectionsDataStructure.removeTopic_CH_Topic(CH, topic, subscriptionID);
+
+        //response if ok:
+
+    //response if error:
+
+    return new FrameFormat(EndOfLine, null, EndOfField);
+}
+
+
+private FrameFormat connectCMD (ConnectionHandler<String> CH){
+
+    //check login?
+
+    //add CH to connections
+    ConnectionsDataStructure.addCHtoDB(CH);
+    //response if ok:
+
+    //response if error:
+
+    return new FrameFormat(EndOfLine, null, EndOfField);
+}
+
+private FrameFormat disconnectCMD (ConnectionHandler<String> CH){
+
+    //check if CH has activ subscriptions, if TRUE - unsubscribe
+    
+
+    //remove CH from connections
+    ConnectionsDataStructure.disconnect(0); //TODO - add connectionID field to CH.
+    //response if ok:
+
+    //response if error:
+
+    return new FrameFormat(EndOfLine, null, EndOfField);
+}
+
+
+private FrameFormat sendCMD (){
+    //check if subscribed to the desired topic
+
+    //add publishing to newsFeed
+
+    //send publishing to all subscribed clients
+
+    //response if ok:
+
+    //response if error:
+
+    return new FrameFormat(EndOfLine, null, EndOfField);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+ }
