@@ -10,17 +10,22 @@
 using json = nlohmann::json;
 using std::string;
 using std::list;
+//////hiiiiiiiiiiiii
 
-// TODO: implement the methods
+// TODO: implement
+char EndOfMassage= '\0';
 
-string FrameFormat::FrameBody()
+//delimiters for transfering to\from string
+const string EndOfLine= "\n";
+const string EndOfField= "\n\ff";    //end of field is also the end of some line
+
+
+FrameFormat::FrameFormat(string stompCMD,list<list<string>> stompHDRS, string FrameBDY) :
+    stompCommand(stompCMD),
+    stompHeaders(new stompHDRS),
+    string FrameBody(FrameBDY)
 {
-    return nullptr;
+    //stompHeaders = list<list(headerName,headerValue)>;
 }
 
-char FrameFormat::EndOfMessage(){
-    return '\0';
-}
-
-
-
+//---------Rule of 5 needed??
