@@ -12,6 +12,8 @@ public class ConnectionsImpl implements Connections<String>{
 
     private ConcurrentHashMap<String, ConcurrentHashMap<ConnectionHandler<String>,Integer>> subscriptionsDB = new ConcurrentHashMap<>();//map<topic,map<CH,subscriptionID>
     
+    private ConcurrentHashMap<String,String> usersNpasswords = new ConcurrentHashMap<>();
+
     static int clientID;        //global (static)
     static int recieptID;        //global (static)
 

@@ -157,7 +157,7 @@ private FrameFormat unsubscribeCMD (String topic, ConnectionHandler<String> CH,i
 private FrameFormat connectCMD (ConnectionHandler<String> CH){
 
     //check login?
-
+    
     //add CH to connections
     ConnectionsDataStructure.addCHtoDB(CH);
     //response if ok:
