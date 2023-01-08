@@ -8,22 +8,23 @@
 using std::string;
 using std::list;
 
+
 class FrameFormat
 {
-private:
 
 public:
+FrameFormat(string stompCMD,list<list<string>> stompHDRS, string FrameBDY);
 
-string stompCommand; // = nullptr;
 
-
-list<list<string>> stompHeaders ; //= new list<list<string>>(); //list<list(headerName,headerValue)
-string FrameBody; // = nullptr;
 char EndOfMassage; // = '\0';
 
 //delimiters for transfering to\from string
 const string EndOfLine; // = "\n";
 const string EndOfField; // = "\n\ff";    //end of field is also the end of some line
 
+private:
+string stompCommand;
+list<list<string>> stompHeaders;
+string FrameBody;
 
 };
