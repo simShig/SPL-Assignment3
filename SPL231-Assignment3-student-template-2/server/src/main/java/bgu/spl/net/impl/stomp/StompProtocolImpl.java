@@ -46,13 +46,13 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
                 responseFrame = subscribeCMD(recievedFrame, CH);
                  break;
             case ("UNSUBSCRIBE"):
-                 responseFrame = unsubscribeCMD(null,CH,0);
+                 responseFrame = unsubscribeCMD(recievedFrame,CH);
                  break;
             case ("CONNECT"):
                  responseFrame = connectCMD(CH);
                  break;
             case ("DISCONNECT"):
-                 responseFrame = disconnectCMD(CH);
+                 responseFrame = disconnectCMD(recievedFrame,CH);
                  break;
             case ("SEND"):
                  responseFrame = sendCMD(recievedFrame,CH);
@@ -150,22 +150,26 @@ private FrameFormat subscribeCMD  (FrameFormat recievedFrame, ConnectionHandler<
     
     //response if error:
         //no subscriptionId sent - error as written upstairs.
-    if (!flag) return ErrorFrame(recieptID, "there was an error adding topic to subscriptions")
+    if (!flag) return ErrorFrame(recieptID, "there was an error adding topic to subscriptions");
 
     //response if ok:
     if (recieptID!=null) return RecieptFrame(recieptID,CH);    
-    return new FrameFormat(EndOfLine, null, EndOfField);
+    return null;
 }
 
-private FrameFormat unsubscribeCMD (String topic, ConnectionHandler<String> CH,int subscriptionID ){
+private FrameFormat unsubscribeCMD (FrameFormat recievedFrame, ConnectionHandler<String> CH){
+    String topic = recievedFrame.headerName2Value("destination:");  //gets headerName,returns headerValue (null if not found) 
+    // String msgBody = recievedFrame.FrameBody;
+    String recieptID = recievedFrame.headerName2Value("recieptID");
+    String subscriptionID = recievedFrame.headerName2Value("id");
+    if (subscriptionID==null) return ErrorFrame(recieptID, "error- no subscription ");
     //remove CH from topic (in subscriptions) and remove topic from CH (in connections):
-    ConnectionsDataStructure.removeTopic_CH_Topic(CH, topic, subscriptionID);
-
-        //response if ok:
-
+    ConnectionsDataStructure.removeTopic_CH_Topic(CH, topic);
+    //response if ok:
+    if (recieptID!=null) return RecieptFrame(recieptID,CH);    
     //response if error:
 
-    return new FrameFormat(EndOfLine, null, EndOfField);
+    return null;
 }
 
 
@@ -182,18 +186,17 @@ private FrameFormat connectCMD (ConnectionHandler<String> CH){
     return new FrameFormat(EndOfLine, null, EndOfField);
 }
 
-private FrameFormat disconnectCMD (ConnectionHandler<String> CH){
-
+private FrameFormat disconnectCMD (FrameFormat recievedFrame,ConnectionHandler<String> CH){
+    // String topic = recievedFrame.headerName2Value("destination:");  //gets headerName,returns headerValue (null if not found) 
+    // String msgBody = recievedFrame.FrameBody;
+    String recieptID = recievedFrame.headerName2Value("recieptID");
     //check if CH has activ subscriptions, if TRUE - unsubscribe
-    
-
-    //remove CH from connections
-    ConnectionsDataStructure.disconnect(0); //TODO - add connectionID field to CH.
+    ConnectionsDataStructure.removeCH(CH);      //remove from connectionsDB, if has subscriptions - unsubscribe from all
     //response if ok:
-
+    FrameFormat response = RecieptFrame(recieptID, CH);
     //response if error:
 
-    return new FrameFormat(EndOfLine, null, EndOfField);
+    return response;
 }
 
 
@@ -218,7 +221,7 @@ private FrameFormat sendCMD (FrameFormat recievedFrame, ConnectionHandler<String
 
 
 private FrameFormat RecieptFrame(String recieptID, ConnectionHandler CH) {
-    FrameFormat recieptResponseFrame = new FrameFormat("RECIEPT", null, null)
+    FrameFormat recieptResponseFrame = new FrameFormat("RECIEPT", null, null);
     if (recieptID!=null){        //add reciept header if needed.
         LinkedList<LinkedList<String>> stompHeaders=new LinkedList<>();
         LinkedList<String> pair = new LinkedList<>();

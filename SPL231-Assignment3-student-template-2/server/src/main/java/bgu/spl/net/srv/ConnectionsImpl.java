@@ -45,7 +45,7 @@ public class ConnectionsImpl implements Connections<String>{
         return true;
     };
 
-    public boolean removeTopic_CH_Topic (ConnectionHandler<String> CH, String topic,int subscriptionID){   //removes topic from CH and CH from TOPIC
+    public boolean removeTopic_CH_Topic (ConnectionHandler<String> CH, String topic){   //removes topic from CH and CH from TOPIC
         connectionsDB.get(CH).remove(topic);
         subscriptionsDB.get(topic).remove(CH);
         return true;
@@ -73,6 +73,14 @@ public class ConnectionsImpl implements Connections<String>{
         return true;
     };
 
-
+public boolean removeCH(ConnectionHandler<String> CH){
+    
+    if (!connectionsDB.get(CH).keySet().isEmpty()){
+        for (String key : connectionsDB.get(CH).keySet()) {
+            removeTopic_CH_Topic(CH, key);
+        }
+    }
+    return true;
+}
 
 }
