@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <list>
 #include <map>
 #include <vector>
 #include <sstream>
@@ -11,16 +12,18 @@ using json = nlohmann::json;
 using std::string;
 using std::list;
 
-// TODO: implement the methods
+// TODO: implement
+char EndOfMassage= '\0';
 
-string FrameFormat::FrameBody()
+//delimiters for transfering to\from string
+const string EndOfLine= "\n";
+const string EndOfField= "\n\ff";    //end of field is also the end of some line
+
+
+FrameFormat::FrameFormat(string stompCMD,list<list<string>> stompHeaders,string FrameBody):
+    stompCommand(stompCMD),stompHeaders(new list<list<string>>()),string FrameBody(frameBody)
 {
-    return nullptr;
+    stompHeaders = list<list(headerName,headerValue)>;
 }
 
-char FrameFormat::EndOfMessage(){
-    return '\0';
-}
-
-
-
+//---------Rule of 5 needed??
