@@ -83,4 +83,14 @@ public boolean removeCH(ConnectionHandler<String> CH){
     return true;
 }
 
+public boolean isLoginOk(String login, String passcode) {
+    String realPassword = usersNpasswords.get(login);       //realPassword is the one already in the database
+    if (realPassword==null){        //if its a new client
+        usersNpasswords.put(login, realPassword);
+        return true;
+    }
+    if (realPassword!=passcode) return false;   //wrong password
+    return true;
+}
+
 }
