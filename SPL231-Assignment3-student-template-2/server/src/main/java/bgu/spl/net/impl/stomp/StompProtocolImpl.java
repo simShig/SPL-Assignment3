@@ -55,7 +55,7 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
                  responseFrame = disconnectCMD(null);
                  break;
             case ("SEND"):
-                 responseFrame = sendCMD(recievedFrame,null,null,null);
+                 responseFrame = sendCMD(recievedFrame,null);
                  break;
             default:
             System.out.print("im in Deafult case");    
@@ -187,31 +187,53 @@ private FrameFormat disconnectCMD (ConnectionHandler<String> CH){
 
 
 private FrameFormat sendCMD (FrameFormat recievedFrame, ConnectionHandler<String> CH){
-    LinkedList<LinkedList<String>> stompHeaders = recievedFrame.stompHeaders;    //list<list(headerName,headerValue)
+    String topic = recievedFrame.headerName2Value("destination:");  //gets headerName,returns headerValue (null if not found) 
     String msgBody = recievedFrame.FrameBody;
-    String topic = stompHeaders.get();
-    ConcurrentHashMap<String,ConcurrentHashMap<String,String>> check = new ConcurrentHashMap<>();
-    check.get(check)
-
+    String recieptID = recievedFrame.headerName2Value("recieptID");
     //check if subscribed to the desired topic
-    if (!ConnectionsDataStructure.subscriptionsDB.get(topic).contains(CH)) return ErrorFrame();
+    if (!ConnectionsDataStructure.subscriptionsDB.get(topic).contains(CH)) return ErrorFrame(recieptID,"Error Massage Body!!!");
     //add publishing to newsFeed
     NewsDataStructure.publish(topic, msgBody);
     //send publishing to all subscribed clients
     ConnectionsDataStructure.send(topic, msgBody);      //sends each of subscribed CH the massage, using CH::send()
     //response if ok:
-
-    //response if error:
+    if (recieptID!=null) return RecieptFrame(recieptID,null);    
+    //response if error: 
+        //"not subscribed error" - sent in the beginning
 
     return new FrameFormat(EndOfLine, null, EndOfField);
 }
 
 
 
-private FrameFormat ErrorFrame() {
-    //TODO - implement error
-    
+private FrameFormat RecieptFrame(String recieptID, ConnectionHandler CH) {
+    FrameFormat recieptResponseFrame = new FrameFormat("RECIEPT", null, null)
+    if (recieptID!=null){        //add reciept header if needed.
+        LinkedList<LinkedList<String>> stompHeaders=new LinkedList<>();
+        LinkedList<String> pair = new LinkedList<>();
+        pair.add("receipt-id");
+        pair.addLast(""+recieptID);
+        stompHeaders.add(pair);
+        recieptResponseFrame.stompHeaders=stompHeaders;
+    }
     return null;
+}
+
+private FrameFormat ErrorFrame(String reciptID,String errorMsgBody) {
+    
+    FrameFormat errorResponseFrame = new FrameFormat("Error", null, errorMsgBody);
+    
+    
+    if (reciptID!=null){        //add reciept header if needed.
+        LinkedList<LinkedList<String>> stompHeaders=new LinkedList<>();
+        LinkedList<String> pair = new LinkedList<>();
+        pair.add("receipt-id");
+        pair.addLast(""+reciptID);
+        stompHeaders.add(pair);
+        errorResponseFrame.stompHeaders=stompHeaders;
+    }
+
+    return errorResponseFrame;
 }
 
 
