@@ -43,23 +43,23 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
         switch (recievedFrame.stompCommand){
             case ("SUBSCRIBE"):
             System.out.print("im in SUBSCRIBE case");    
-                responseFrame = subscribeCMD(null, null, 0);
+                responseFrame = subscribeCMD(recievedFrame, CH);
                  break;
             case ("UNSUBSCRIBE"):
-                 responseFrame = unsubscribeCMD(null,null,0);
+                 responseFrame = unsubscribeCMD(null,CH,0);
                  break;
             case ("CONNECT"):
-                 responseFrame = connectCMD(null);
+                 responseFrame = connectCMD(CH);
                  break;
             case ("DISCONNECT"):
-                 responseFrame = disconnectCMD(null);
+                 responseFrame = disconnectCMD(CH);
                  break;
             case ("SEND"):
-                 responseFrame = sendCMD(recievedFrame,null);
+                 responseFrame = sendCMD(recievedFrame,CH);
                  break;
             default:
             System.out.print("im in Deafult case");    
-            responseFrame=new FrameFormat("ERROR", null, "your title is wrong")  ;//return ERROR
+            responseFrame=ErrorFrame(null, "DIDNT PARSE YOUR MASSAGE!") ;//return ERROR
 
             
         }
@@ -134,15 +134,26 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
 
 //SUBSCRIBE:
 
-private FrameFormat subscribeCMD (String topic, ConnectionHandler<String> CH,int subscriptionID ){
-    //add topic to CH (in connections):
-    ConnectionsDataStructure.addCHtoDB(CH);
+private FrameFormat subscribeCMD  (FrameFormat recievedFrame, ConnectionHandler<String> CH){
+    String topic = recievedFrame.headerName2Value("destination:");  //gets headerName,returns headerValue (null if not found) 
+    String msgBody = recievedFrame.FrameBody;
+    String recieptID = recievedFrame.headerName2Value("recieptID");
+    String subscriptionID = recievedFrame.headerName2Value("id");
+    if (subscriptionID==null) return ErrorFrame(recieptID, "error- no subscription ");
     //add CH to topic (in subscriptions):
-    ConnectionsDataStructure.addTopicToCH(CH, topic, subscriptionID);
-    //response if ok:
-
+    boolean flag = ConnectionsDataStructure.addTopicToCH(CH, topic, subscriptionID);
+    //add topic to CH (in connections):
+    if (flag){
+        ConnectionsDataStructure.addCHtoDB(CH);
+        ConnectionsDataStructure.connectionsDB.get(CH).put(topic, subscriptionID);
+    }
+    
     //response if error:
+        //no subscriptionId sent - error as written upstairs.
+    if (!flag) return ErrorFrame(recieptID, "there was an error adding topic to subscriptions")
 
+    //response if ok:
+    if (recieptID!=null) return RecieptFrame(recieptID,CH);    
     return new FrameFormat(EndOfLine, null, EndOfField);
 }
 
@@ -197,11 +208,11 @@ private FrameFormat sendCMD (FrameFormat recievedFrame, ConnectionHandler<String
     //send publishing to all subscribed clients
     ConnectionsDataStructure.send(topic, msgBody);      //sends each of subscribed CH the massage, using CH::send()
     //response if ok:
-    if (recieptID!=null) return RecieptFrame(recieptID,null);    
+    if (recieptID!=null) return RecieptFrame(recieptID,CH);    
     //response if error: 
         //"not subscribed error" - sent in the beginning
 
-    return new FrameFormat(EndOfLine, null, EndOfField);
+    return null;        //only respond if cliet wants reciept
 }
 
 

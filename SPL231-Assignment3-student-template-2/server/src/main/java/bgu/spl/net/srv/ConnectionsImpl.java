@@ -10,9 +10,9 @@ public class ConnectionsImpl implements Connections<String>{
 
     //fields:
     
-    public ConcurrentHashMap<ConnectionHandler<String>, ConcurrentHashMap<String,Integer>> connectionsDB = new ConcurrentHashMap<>();//map<CH,map<Topic,subscriptionID> 
+    public ConcurrentHashMap<ConnectionHandler<String>, ConcurrentHashMap<String,String>> connectionsDB = new ConcurrentHashMap<>();//map<CH,map<Topic,subscriptionID> 
 
-    public ConcurrentHashMap<String, ConcurrentHashMap<ConnectionHandler<String>,Integer>> subscriptionsDB = new ConcurrentHashMap<>();//map<topic,map<CH,subscriptionID>
+    public ConcurrentHashMap<String, ConcurrentHashMap<ConnectionHandler<String>,String>> subscriptionsDB = new ConcurrentHashMap<>();//map<topic,map<CH,subscriptionID>
     
     private ConcurrentHashMap<String,String> usersNpasswords = new ConcurrentHashMap<>();
 
@@ -51,7 +51,7 @@ public class ConnectionsImpl implements Connections<String>{
         return true;
     }
 
-    public boolean addTopicToCH(ConnectionHandler<String> CH, String topic,int subscriptionID){     //add Topic to subscriptionDB (and to connectionsDB[CH]),part of SUBSCRIBE
+    public boolean addTopicToCH(ConnectionHandler<String> CH, String topic,String subscriptionID){     //add Topic to subscriptionDB (and to connectionsDB[CH]),part of SUBSCRIBE
         //add topic to connectionsDB:
         try{
             connectionsDB.get(CH).put(topic, subscriptionID);
@@ -59,7 +59,7 @@ public class ConnectionsImpl implements Connections<String>{
     
         //add CH and subID to subscriptionsDB
        
-        ConcurrentHashMap<ConnectionHandler<String>,Integer> innerMap = subscriptionsDB.computeIfAbsent(topic, k -> new ConcurrentHashMap<>());
+        ConcurrentHashMap<ConnectionHandler<String>,String> innerMap = subscriptionsDB.computeIfAbsent(topic, k -> new ConcurrentHashMap<>());
         innerMap.put(CH, subscriptionID);
         
         /*
