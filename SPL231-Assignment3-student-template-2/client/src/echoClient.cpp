@@ -24,8 +24,15 @@ int main (int argc, char *argv[]) {
         char buf[bufsize];
         std::cin.getline(buf, bufsize);
 		std::string line(buf);
-		int len=line.length();
-        if (!connectionHandler.sendLine(line)) {
+
+        FrameFormat inputFrame = line2Frame(line);
+
+        String convertedFrame = Frame2String(inputFrame);
+
+
+		int len=convertedFrame.length();
+
+        if (!connectionHandler.sendLine(convertedFrame)) {
             std::cout << "Disconnected. Exiting...\n" << std::endl;
             break;
         }
@@ -45,6 +52,9 @@ int main (int argc, char *argv[]) {
             break;
         }
         
+        FrameFormat recievedFrame = string2Frame(answer);
+        MyProtocol.proccess(recievedFrame);
+
 		len=answer.length();
 		// A C string must end with a 0 char delimiter.  When we filled the answer buffer from the socket
 		// we filled up to the \n char - we must make sure now that a 0 char is also present. So we truncate last character.

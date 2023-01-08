@@ -20,8 +20,8 @@ const string EndOfLine= "\n";
 const string EndOfField= "\n\ff";    //end of field is also the end of some line
 
 
-FrameFormat::FrameFormat(string stompCMD,list<list<string>> stompHeaders,string FrameBody):
-    stompCommand(stompCMD),stompHeaders(new list<list<string>>()),string FrameBody(frameBody)
+FrameFormat::FrameFormat(string stompCMD,list<list<string>> stompHDRS,string FrameBody):
+    stompCommand(stompCMD),stompHDRS(new list<list<string>>()),FrameBody(FrameBody)
 {
     stompHeaders = list<list(headerName,headerValue)>;
 }
