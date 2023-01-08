@@ -11,7 +11,7 @@ import bgu.spl.net.srv.BlockingConnectionHandler;
 import bgu.spl.net.srv.ConnectionHandler;
 import bgu.spl.net.srv.ConnectionsImpl;
 import java.util.LinkedList;
-
+import java.util.concurrent.ConcurrentHashMap;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -43,8 +43,8 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
         switch (recievedFrame.stompCommand){
             case ("SUBSCRIBE"):
             System.out.print("im in SUBSCRIBE case");    
-            //  responseFrame = subscribeCMD(null, null, 0);
-                //  break;
+                responseFrame = subscribeCMD(null, null, 0);
+                 break;
             case ("UNSUBSCRIBE"):
                  responseFrame = unsubscribeCMD(null,null,0);
                  break;
@@ -55,16 +55,16 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
                  responseFrame = disconnectCMD(null);
                  break;
             case ("SEND"):
-                 responseFrame = sendCMD();
+                 responseFrame = sendCMD(recievedFrame,null,null,null);
                  break;
             default:
             System.out.print("im in Deafult case");    
-            //  responseFrame=new FrameFormat("ERROR", null, "your title is wrong")  ;//return ERROR
+            responseFrame=new FrameFormat("ERROR", null, "your title is wrong")  ;//return ERROR
 
             
         }
         return frame2String(responseFrame);
-        //return ((Command) message).execute(NewsDataStructure,ConnectionsDataStructure);        //TODO - change to fit XxxxxCommand.execute (as we designed)
+        
     };
 	
 
@@ -128,6 +128,10 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
  * ~~~~~~~~~~~~Proccessing Commands (methods)~~~~~~~~~~~~~~~~
  */
 
+ /*
+  * Types of server responses: MESSAGE,CONNECTED,RECIEPT,ERROR/
+  */
+
 //SUBSCRIBE:
 
 private FrameFormat subscribeCMD (String topic, ConnectionHandler<String> CH,int subscriptionID ){
@@ -157,7 +161,7 @@ private FrameFormat unsubscribeCMD (String topic, ConnectionHandler<String> CH,i
 private FrameFormat connectCMD (ConnectionHandler<String> CH){
 
     //check login?
-    
+
     //add CH to connections
     ConnectionsDataStructure.addCHtoDB(CH);
     //response if ok:
@@ -182,18 +186,32 @@ private FrameFormat disconnectCMD (ConnectionHandler<String> CH){
 }
 
 
-private FrameFormat sendCMD (){
+private FrameFormat sendCMD (FrameFormat recievedFrame, ConnectionHandler<String> CH){
+    LinkedList<LinkedList<String>> stompHeaders = recievedFrame.stompHeaders;    //list<list(headerName,headerValue)
+    String msgBody = recievedFrame.FrameBody;
+    String topic = stompHeaders.get();
+    ConcurrentHashMap<String,ConcurrentHashMap<String,String>> check = new ConcurrentHashMap<>();
+    check.get(check)
+
     //check if subscribed to the desired topic
-
+    if (!ConnectionsDataStructure.subscriptionsDB.get(topic).contains(CH)) return ErrorFrame();
     //add publishing to newsFeed
-
+    NewsDataStructure.publish(topic, msgBody);
     //send publishing to all subscribed clients
-
+    ConnectionsDataStructure.send(topic, msgBody);      //sends each of subscribed CH the massage, using CH::send()
     //response if ok:
 
     //response if error:
 
     return new FrameFormat(EndOfLine, null, EndOfField);
+}
+
+
+
+private FrameFormat ErrorFrame() {
+    //TODO - implement error
+    
+    return null;
 }
 
 

@@ -8,7 +8,6 @@ public class FrameFormat {
 
 String stompCommand = null;
 public LinkedList<LinkedList<String>> stompHeaders = new LinkedList<>();    //list<list(headerName,headerValue)
-//public ConcurrentHashMap<String,String> stompHeaders = new ConcurrentHashMap<>();//map<headerName,headerValue> 
 String FrameBody = null;
 char EndOfMassage = '\u0000';
 

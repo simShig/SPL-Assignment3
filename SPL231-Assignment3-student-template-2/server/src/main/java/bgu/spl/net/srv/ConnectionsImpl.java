@@ -1,6 +1,8 @@
 package bgu.spl.net.srv;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -8,9 +10,9 @@ public class ConnectionsImpl implements Connections<String>{
 
     //fields:
     
-    private ConcurrentHashMap<ConnectionHandler<String>, ConcurrentHashMap<String,Integer>> connectionsDB = new ConcurrentHashMap<>();//map<CH,map<Topic,subscriptionID> 
+    public ConcurrentHashMap<ConnectionHandler<String>, ConcurrentHashMap<String,Integer>> connectionsDB = new ConcurrentHashMap<>();//map<CH,map<Topic,subscriptionID> 
 
-    private ConcurrentHashMap<String, ConcurrentHashMap<ConnectionHandler<String>,Integer>> subscriptionsDB = new ConcurrentHashMap<>();//map<topic,map<CH,subscriptionID>
+    public ConcurrentHashMap<String, ConcurrentHashMap<ConnectionHandler<String>,Integer>> subscriptionsDB = new ConcurrentHashMap<>();//map<topic,map<CH,subscriptionID>
     
     private ConcurrentHashMap<String,String> usersNpasswords = new ConcurrentHashMap<>();
 
@@ -21,13 +23,16 @@ public class ConnectionsImpl implements Connections<String>{
     //TODO - Implement this class entirely - only implemented skelaton so i can referance Type ConnectionsImpl as a Type.
 
     //methods:
-    public boolean send(int connectionId, String msg){  //needs to apply CH::send()
+    public boolean send(int connectionId, String msg){  //send to certain CH. needs to apply CH::send()
         
             return false;
     };
 
-    public void send(String channel, String msg){   //needs to apply CH::send()
-
+    public void send(String channel, String msg){   //send ALL SUBSCRIBED! needs to apply CH::send()
+        Collection<ConnectionHandler<String>> registeredCHs = subscriptionsDB.get(channel).keySet();
+        for (ConnectionHandler<String> CH : registeredCHs) {
+            CH.send(msg);
+        }
     };
 
     public void disconnect(int connectionId){
