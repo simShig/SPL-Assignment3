@@ -18,7 +18,7 @@ public class StompEncoderDecoder implements MessageEncoderDecoder<String> {
     public String decodeNextByte(byte nextByte) {
         //notice that the top 128 ascii characters have the same representation as their utf-8 counterparts
         //this allow us to do the following comparison
-        if (nextByte == '\u0000') {         //null sign in java
+        if (nextByte == '\n') {         //  \u0000 null sign in java
             return popString();
         }
 

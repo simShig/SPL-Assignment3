@@ -12,6 +12,8 @@ public class ConnectionsImpl implements Connections<String>{
 
     private ConcurrentHashMap<String, ConcurrentHashMap<ConnectionHandler<String>,Integer>> subscriptionsDB = new ConcurrentHashMap<>();//map<topic,map<CH,subscriptionID>
     
+    private ConcurrentHashMap<String,String> usersNpasswords = new ConcurrentHashMap<>();
+
     static int clientID;        //global (static)
     static int recieptID;        //global (static)
 
@@ -38,6 +40,11 @@ public class ConnectionsImpl implements Connections<String>{
         return true;
     };
 
+    public boolean removeTopic_CH_Topic (ConnectionHandler<String> CH, String topic,int subscriptionID){   //removes topic from CH and CH from TOPIC
+        connectionsDB.get(CH).remove(topic);
+        subscriptionsDB.get(topic).remove(CH);
+        return true;
+    }
 
     public boolean addTopicToCH(ConnectionHandler<String> CH, String topic,int subscriptionID){     //add Topic to subscriptionDB (and to connectionsDB[CH]),part of SUBSCRIBE
         //add topic to connectionsDB:

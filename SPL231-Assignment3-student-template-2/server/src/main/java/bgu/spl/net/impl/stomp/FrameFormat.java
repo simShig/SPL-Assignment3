@@ -14,7 +14,7 @@ char EndOfMassage = '\u0000';
 
 //delimiters for transfering to\from string
 static String EndOfLine = "\n";
-static String EndOfField = "\n\ff";    //end of field is also the end of some line
+static String EndOfField = "f";    //end of field is also the end of some line
 
 
 //methods:
