@@ -216,7 +216,7 @@ private FrameFormat disconnectCMD (FrameFormat recievedFrame,ConnectionHandler<S
 }
 
 
-private FrameFormat sendCMD (FrameFormat recievedFrame, ConnectionHandler<String> CH){
+private FrameFormat sendCMD (FrameFormat recievedFrame, ConnectionHandler<String> CH){  //returns MESSAGE frame
     String topic = recievedFrame.headerName2Value("destination:");  //gets headerName,returns headerValue (null if not found) 
     String msgBody = recievedFrame.FrameBody;
     String recieptID = recievedFrame.headerName2Value("recieptID");
@@ -224,8 +224,31 @@ private FrameFormat sendCMD (FrameFormat recievedFrame, ConnectionHandler<String
     if (!ConnectionsDataStructure.subscriptionsDB.get(topic).contains(CH)) return ErrorFrame(recievedFrame," short explanation","Error Massage Body!!!");
     //add publishing to newsFeed
     NewsDataStructure.publish(topic, msgBody);
-    //send publishing to all subscribed clients
-    ConnectionsDataStructure.send(topic, msgBody);      //sends each of subscribed CH the massage, using CH::send()
+
+    //convert to MASSAGE frame
+    FrameFormat massageFrame = new FrameFormat("MESSAGE", null, msgBody);
+    
+    //add headersList:
+    LinkedList<LinkedList<String>> stompHeaders=new LinkedList<>();
+    LinkedList<String> pair = new LinkedList<>();
+    pair.add("FILLSUBSCRIPTIONHERE");      //will be added inside connectionsImpl::send() because subscription id of the specific client is needed.
+    pair.addLast("");   //because subscription id is unique for each CH, it will be added inside send()
+    stompHeaders.add(pair);
+
+    pair = new LinkedList<>();
+    pair.add("message-id");
+    pair.addLast(""+ConnectionsImpl.massageID++);
+    stompHeaders.add(pair);
+
+    pair = new LinkedList<>();
+    pair.add("destination");
+    pair.addLast(topic);
+    stompHeaders.add(pair);
+
+    massageFrame.stompHeaders=stompHeaders;
+    //send publishing to all subscribed clients (inside the method -  adding subscription id))
+    String partialMessage = frame2String(massageFrame);
+    ConnectionsDataStructure.send(topic, partialMessage);      //sends each of subscribed CH the massage, using CH::send()
     //response if ok:
     if (recieptID!=null) return RecieptFrame(recieptID,CH);    
     //response if error: 

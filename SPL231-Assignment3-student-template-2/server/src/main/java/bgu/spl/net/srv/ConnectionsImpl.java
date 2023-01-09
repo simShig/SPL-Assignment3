@@ -18,6 +18,7 @@ public class ConnectionsImpl implements Connections<String>{
 
     static int clientID;        //global (static)
     static int recieptID;        //global (static)
+    public static int massageID;           //global (static)
 
 
     //TODO - Implement this class entirely - only implemented skelaton so i can referance Type ConnectionsImpl as a Type.
@@ -29,8 +30,13 @@ public class ConnectionsImpl implements Connections<String>{
     };
 
     public void send(String channel, String msg){   //send ALL SUBSCRIBED! needs to apply CH::send()
+        //note that the msg here is already translated frame2string!!!
+        //also, because subscriptionID needed, i split and merge here:
+        String[] splited = msg.split("FILLSUBSCRIPTIONHERE", 1);
         Collection<ConnectionHandler<String>> registeredCHs = subscriptionsDB.get(channel).keySet();
         for (ConnectionHandler<String> CH : registeredCHs) {
+            String subId = subscriptionsDB.get(channel).get(CH);    //get CHs subscription id
+            msg = splited[0]+"subscription:"+subId+splited[1];      //chain it all to a new String
             CH.send(msg);
         }
     };
