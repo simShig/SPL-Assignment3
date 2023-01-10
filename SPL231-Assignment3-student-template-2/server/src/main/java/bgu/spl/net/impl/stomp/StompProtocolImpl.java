@@ -84,8 +84,10 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
 
     public FrameFormat string2Frame (String str){               //transforms msg back to frame
         String[] splitByFields = str.split(EndOfField);
+                                System.out.println("EndOfField delimiter is: "+EndOfField);//for DEBUG
         //commandHeader:
         String sCommand = splitByFields[0];
+                                 System.out.println("sCommand is: "+sCommand);//for DEBUG
         //stompHeaders:
         LinkedList<LinkedList<String>> sHeaders = new LinkedList<>();
         if (splitByFields.length!=3)  System.out.println("amount of fields is "+ splitByFields.length+", should be 3 (error im StompProtocolImpl::string2frame");
@@ -121,7 +123,7 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
         ans+=EndOfField;
     
     //add body:
-        ans+= frame.FrameBody+EndOfField;
+        ans+= frame.FrameBody+EndOfField +" ";
     //add EOM:
         ans+=frame.EndOfMassage;
         return ans;
@@ -298,6 +300,7 @@ private FrameFormat ErrorFrame(FrameFormat recievedFrame,String errorMsgHeader,S
     msgBody+
     "\n-----"+
     errorMsgBody;
+    errorResponseFrame.FrameBody=responseFrameMsgBody;
 
     return errorResponseFrame;
 }

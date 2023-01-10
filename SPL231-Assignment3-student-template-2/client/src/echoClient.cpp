@@ -1,6 +1,10 @@
 #include <stdlib.h>
 #include "../include/ConnectionHandler.h"
 
+/*
+massage to proccess: SUBSCRIBE;F;headerName:headerValue;L;headerName2:sdsd;L;;F;msgBodyDSDFSDF;L;;F;\u0000
+*/
+
 /**
 * This code assumes that the server replies the exact text the client sent it (as opposed to the practical session example)
 */
@@ -25,13 +29,13 @@ int main (int argc, char *argv[]) {
         std::cin.getline(buf, bufsize);
 		std::string line(buf);
 		int len=line.length();
+            // std::cout<<line<<std::endl;      //for DEBUG
         if (!connectionHandler.sendLine(line)) {
             std::cout << "Disconnected. Exiting...\n" << std::endl;
             break;
         }
 		// connectionHandler.sendLine(line) appends '\n' to the message. Therefor we send len+1 bytes.
         std::cout << "Sent " << len+1 << " bytes to server" << std::endl;
-
  
         // We can use one of three options to read data from the server:
         // 1. Read a fixed number of characters

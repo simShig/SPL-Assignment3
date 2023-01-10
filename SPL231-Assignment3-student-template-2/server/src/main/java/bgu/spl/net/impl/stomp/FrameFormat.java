@@ -12,8 +12,8 @@ String FrameBody = null;
 char EndOfMassage = '\u0000';
 
 //delimiters for transfering to\from string
-static String EndOfLine = "\n";
-static String EndOfField = "f";    //end of field is also the end of some line
+static String EndOfLine = ";L;";
+static String EndOfField = ";F;";    //end of field is also the end of some line
 
 
 //methods:

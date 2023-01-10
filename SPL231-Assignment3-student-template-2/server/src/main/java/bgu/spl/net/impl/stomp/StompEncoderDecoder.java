@@ -18,10 +18,11 @@ public class StompEncoderDecoder implements MessageEncoderDecoder<String> {
     public String decodeNextByte(byte nextByte) {
         //notice that the top 128 ascii characters have the same representation as their utf-8 counterparts
         //this allow us to do the following comparison
-        if (nextByte == '\n') {         //  \u0000 null sign in java
+        if (nextByte == '\u0000') {         //  \u0000 null sign in java
+            // System.out.println("inside EncDec - decodeNextByte");
             return popString();
         }
-
+        // System.out.println("right before EncDec::pushByte");
         pushByte(nextByte);
         return null; //not a line yet
     }
@@ -43,6 +44,7 @@ public class StompEncoderDecoder implements MessageEncoderDecoder<String> {
         //notice that we explicitly requesting that the string will be decoded from UTF-8
         //this is not actually required as it is the default encoding in java.
         String result = new String(bytes, 0, len, StandardCharsets.UTF_8);
+        // System.out.println("inside EncoderDecoder::popstring() : " +result);
         len = 0;
         return result;
     }

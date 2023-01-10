@@ -32,15 +32,16 @@ public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler
             int read;
 
             in = new BufferedInputStream(sock.getInputStream());
-            System.out.println("inside CH - finished sock.getInput"+ in.read());
+            // System.out.println("inside CH - finished sock.getInput"+ in.read());
             out = new BufferedOutputStream(sock.getOutputStream());
-            System.out.println("inside CH - finished sock.getoutput"+ out);
-            System.out.println("should terminate: "+ protocol.shouldTerminate());
+            // System.out.println("inside CH - finished sock.getoutput"+ out);
+            // System.out.println("should terminate: "+ protocol.shouldTerminate());
             while (!protocol.shouldTerminate() && connected && (read = in.read()) >= 0) {
+                    // System.out.println("Read:"+ read);
                 String nextMessage = encdec.decodeNextByte((byte) read);
-                System.out.println("inside CH - WHILE loop, next massage:"+ nextMessage);
+                // System.out.println("inside CH - WHILE loop, next massage:"+ nextMessage);
                 if (nextMessage != null) {
-                    System.out.println("inside CH - if next massage!=null");
+                    // System.out.println("inside CH - if next massage!=null");
                     String response = protocol.process(nextMessage);
                     if (response != null) {
                         out.write(encdec.encode(response));
