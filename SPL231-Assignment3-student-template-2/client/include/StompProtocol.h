@@ -7,4 +7,7 @@ class StompProtocol
 {
 private:
 public:
+string process(string message); 
+FrameFormat string2Frame(string line);
+string Frame2String(FrameFormat frame);
 };

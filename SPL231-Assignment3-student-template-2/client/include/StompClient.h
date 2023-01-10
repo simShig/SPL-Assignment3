@@ -10,8 +10,10 @@ class StompClient
 {
 private:
 public:
-int subID;
-int receiptID;
+static int subID;
+static int receiptID;
+void MyProtocol = StompProtocol();
+
 
 
 };

@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include "../include/ConnectionHandler.h"
 #include "../include/StompClient.h"
+#include "../include/FrameFormat.h"
+
 
 
 int main(int argc, char *argv[]) { if (argc < 3) {
@@ -27,7 +29,7 @@ int main(int argc, char *argv[]) { if (argc < 3) {
 		std::string line(buf);
 
         //we added----
-        FrameFormat inputFrame = line2Frame(line);
+        FrameFormat inputFrame = string2Frame(line);
         string convertedFrame = Frame2String(inputFrame);
 
 
@@ -71,4 +73,3 @@ int main(int argc, char *argv[]) { if (argc < 3) {
     }
     return 0;
 }
-

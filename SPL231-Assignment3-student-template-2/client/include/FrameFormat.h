@@ -19,8 +19,8 @@ FrameFormat(string stompCMD,list<list<string>> stompHDRS, string FrameBDY);
 char EndOfMassage; // = '\0';
 
 //delimiters for transfering to\from string
-const string EndOfLine; // = "\n";
-const string EndOfField; // = "\n\ff";    //end of field is also the end of some line
+static string EndOfLine; // = "\n";
+static string EndOfField; // = "\n\ff";    //end of field is also the end of some line
 
 private:
 string stompCommand;
