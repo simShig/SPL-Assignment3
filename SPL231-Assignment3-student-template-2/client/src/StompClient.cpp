@@ -1,4 +1,5 @@
-#pragma once
+#ifndef STOMPCLIENT_CPP
+#define STOMPCLIENT_CPP
 
 #include "../include/StompProtocol.h"
 #include "../include/ConnectionHandler.h"
@@ -48,15 +49,18 @@ int main(int argc, char *argv[])
         //---we ended adding
 
         int len = convertedFrame.length();
-        if (!connectionHandler.sendLine(convertedFrame))
-        {
-            std::cout << "Disconnected. Exiting...\n"
-                      << std::endl;
-            break;
-        }
-        // connectionHandler.sendLine(line) appends '\n' to the message. Therefor we send len+1 bytes.
-        std::cout << "Sent " << len + 1 << " bytes to server" << std::endl;
-    }
-
-th1.join();
+        if (convertedFrame != "%")
+		{ // meaning it was a legal command
+			if (!connectionHandler.sendLine(convertedFrame))
+			{
+				std::cout << "Disconnected. Exiting...\n"
+						  << std::endl;
+				break;
+			}
+			// connectionHandler.sendLine(line) appends '\n' to the message. Therefor we send len+1 bytes.
+			std::cout << "Sent " << len + 1 << " bytes to server" << std::endl;
+		}
+	}
+	th1.join();
 }
+#endif

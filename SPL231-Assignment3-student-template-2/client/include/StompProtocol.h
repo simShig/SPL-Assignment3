@@ -1,4 +1,6 @@
-#pragma once
+#ifndef STOMPPROTOCOL_CPP
+#define STOMPPROTOCOL_CPP
+
 #include "../include/ConnectionHandler.h"
 #include "../include/FrameFormat.h"
 #include <unordered_map>
@@ -8,6 +10,8 @@
 class StompProtocol
 {
 private:
+    string EOL = ";L;"; //end of line
+    string EndOfField = ";F;"; //end of field
     int recipt_id_counter;
     int game_id_counter;
     bool should_terminate;
@@ -32,3 +36,4 @@ public:
     void stompToString(std::string &stompFrame);
     std::string stringToStomp(std::string &dataFromUser);
 };
+#endif

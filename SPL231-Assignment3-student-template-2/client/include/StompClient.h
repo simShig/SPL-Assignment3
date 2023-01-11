@@ -9,6 +9,7 @@
 class StompClient
 {
 private:
+string userName;
 public:
 static int subID;
 static int receiptID;

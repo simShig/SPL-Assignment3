@@ -1,3 +1,5 @@
+#ifndef CONNECTIONHANDLER_CPP
+#define CONNECTIONHANDLER_CPP
 #include "../include/ConnectionHandler.h"
 
 using boost::asio::ip::tcp;
@@ -106,3 +108,4 @@ void ConnectionHandler::close() {
 		std::cout << "closing failed: connection already closed" << std::endl;
 	}
 }
+#endif
