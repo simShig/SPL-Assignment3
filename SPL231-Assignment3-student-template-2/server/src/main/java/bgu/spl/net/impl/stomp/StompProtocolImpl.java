@@ -6,17 +6,13 @@ package bgu.spl.net.impl.stomp;
 
 import bgu.spl.net.api.StompMessagingProtocol;
 import bgu.spl.net.impl.newsfeed.NewsFeed;
-import bgu.spl.net.impl.rci.Command;
 import bgu.spl.net.srv.BlockingConnectionHandler;
 import bgu.spl.net.srv.ConnectionHandler;
 import bgu.spl.net.srv.ConnectionsImpl;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.swing.plaf.basic.BasicTreeUI.TreeHomeAction;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
 
 public class StompProtocolImpl implements StompMessagingProtocol<String> {
 
@@ -24,26 +20,31 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
     private String EndOfField = FrameFormat.EndOfField;
     private boolean shouldTerminate = false;
     private NewsFeed NewsDataStructure; 
-    private ConnectionsImpl ConnectionsDataStructure;
-    public stompUser activeUser;
-    public ConnectionHandler CH;
+    private ConnectionsImpl<String> ConnectionsDataStructure;
+    
+    public ConnectionHandler myCH = null;
     
     // public void start(int connectionId, Connections<String> connections){   //someone in the group said Hadi allowed to delete it
     //     return;
     // };
-    public StompProtocolImpl (NewsFeed NDS, ConnectionsImpl CDS){   //CONSTRUCTOR - inspired by RCIprotocol
+    public StompProtocolImpl (NewsFeed NDS, ConnectionsImpl<String> CDS){   //CONSTRUCTOR - inspired by RCIprotocol
         NewsDataStructure = NDS;
         ConnectionsDataStructure = CDS;
-        activeUser = new stompUser("fake", "fake");     //only for initializing
     }
     
+    public boolean setCH(ConnectionHandler<String> CH){
+        myCH = CH;
+        return true;
+    }
+
     public String process(String  msg){           //SMP interface method
         //message PARSE() method                  //TODO - method to parse the massage 
        
        //something weird -when we get a massage it starts it with second char (miss the first one...)
 
-        System.out.println("the massage proccessing now: "+msg);
-        BlockingConnectionHandler<String> CH = null;    //the ConnectionHandler of the client from whom the massage is recieved.
+                    System.out.println("the massage proccessing now: "+msg);//for debug
+
+        ConnectionHandler<String> CH = myCH;    //the ConnectionHandler of the client from whom the massage is recieved.
         FrameFormat recievedFrame =string2Frame(msg);
         FrameFormat responseFrame = null;
         switch (recievedFrame.stompCommand){
@@ -189,8 +190,10 @@ private FrameFormat connectCMD (FrameFormat recievedFrame, ConnectionHandler<Str
     String passcode = recievedFrame.headerName2Value("passcode");
     //check login?
     boolean isLoginOk = ConnectionsDataStructure.isLoginOk(login, passcode);
-    //add CH to connections
     if (isLoginOk){
+        //change CH::activeUser to logged user:
+        CH.setActiveUser(login);
+        //add CH to connections
         ConnectionsDataStructure.addCHtoDB(CH);
     //response if ok:
         FrameFormat ConnectedResponseFrame = new FrameFormat("CONNECTED",null,null);

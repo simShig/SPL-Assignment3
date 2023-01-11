@@ -1,7 +1,6 @@
 package bgu.spl.net.srv;
 
-import bgu.spl.net.api.MessageEncoderDecoder;
-import bgu.spl.net.api.MessagingProtocol;
+
 import bgu.spl.net.api.StompMessagingProtocol;
 import bgu.spl.net.impl.stomp.StompEncoderDecoder;
 
@@ -105,7 +104,8 @@ public class Reactor<T> implements Server<T> {
                 protocolFactory.get(),
                 clientChan,
                 this);
-        clientChan.register(selector, SelectionKey.OP_READ, handler);
+            handler.protocol.setCH(handler);    
+            clientChan.register(selector, SelectionKey.OP_READ, handler);
     }
 
     private void handleReadWrite(SelectionKey key) {

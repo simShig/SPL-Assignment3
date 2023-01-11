@@ -17,6 +17,7 @@ public interface ConnectionHandler<T> extends Closeable {
      *
      */
 
-    void send(T msg);
+    void setActiveUser(String username);
+     void send(T msg);
 
 }

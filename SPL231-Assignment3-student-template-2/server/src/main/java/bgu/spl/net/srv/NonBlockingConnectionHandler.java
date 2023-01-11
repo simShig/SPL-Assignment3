@@ -4,6 +4,7 @@ import bgu.spl.net.api.MessageEncoderDecoder;
 import bgu.spl.net.api.MessagingProtocol;
 import bgu.spl.net.api.StompMessagingProtocol;
 import bgu.spl.net.impl.stomp.StompEncoderDecoder;
+import bgu.spl.net.impl.stomp.stompUser;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -16,7 +17,7 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
 
     private static final int BUFFER_ALLOCATION_SIZE = 1 << 13; //8k
     private static final ConcurrentLinkedQueue<ByteBuffer> BUFFER_POOL = new ConcurrentLinkedQueue<>();
-    private final StompMessagingProtocol<T> protocol;
+    public final StompMessagingProtocol<T> protocol;
     private final StompEncoderDecoder encdec;
     private final Queue<ByteBuffer> writeQueue = new ConcurrentLinkedQueue<>();
     private final SocketChannel chan;
@@ -26,6 +27,7 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
     public String host = "stomp.cs.bgu.ac.il";
     public String login=null;
     public String password=null;
+    public String activeUserName = null;
 
     public NonBlockingConnectionHandler(
             StompEncoderDecoder reader,
@@ -38,6 +40,11 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
         this.reactor = reactor;
     }
 
+    public void setActiveUser(String username) {
+        activeUserName = username;
+        
+    }
+    
     public Runnable continueRead() {
         ByteBuffer buf = leaseBuffer();
 

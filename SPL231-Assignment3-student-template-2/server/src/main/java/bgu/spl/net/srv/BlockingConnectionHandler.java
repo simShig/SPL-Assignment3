@@ -5,6 +5,7 @@ import bgu.spl.net.api.MessageEncoderDecoder;
 import bgu.spl.net.api.MessagingProtocol;
 import bgu.spl.net.api.StompMessagingProtocol;
 import bgu.spl.net.impl.stomp.StompEncoderDecoder;
+import bgu.spl.net.impl.stomp.stompUser;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -19,15 +20,21 @@ public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler
     private BufferedInputStream in;
     private BufferedOutputStream out;
     private volatile boolean connected = true;
+    public int connectionId;
+    static int connectionIdCounter=1;
+    public String activeUserName = null;
+
 
     public BlockingConnectionHandler(Socket sock, StompEncoderDecoder reader, StompMessagingProtocol<T> protocol) {
         this.sock = sock;
         this.encdec = reader;
         this.protocol = protocol;
+        this.connectionId = connectionIdCounter++;
     }
 
     @Override
     public void run() {
+        protocol.setCH(this);
         try (Socket sock = this.sock) { //just for automatic closing
             int read;
 
@@ -42,6 +49,7 @@ public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler
                 // System.out.println("inside CH - WHILE loop, next massage:"+ nextMessage);
                 if (nextMessage != null) {
                     // System.out.println("inside CH - if next massage!=null");
+                    
                     String response = protocol.process(nextMessage);
                     if (response != null) {
                         out.write(encdec.encode(response));
@@ -51,7 +59,7 @@ public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler
             }
 
         } catch (IOException ex) {
-            System.out.println("inside catch IOException");
+            //System.out.println("inside catch IOException");
             ex.printStackTrace();
         }
 
@@ -66,5 +74,11 @@ public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler
     @Override
     public void send(T msg) {
         //IMPLEMENT IF NEEDED
+    }
+
+    @Override
+    public void setActiveUser(String username) {
+        activeUserName = username;
+        
     }
 }

@@ -8,15 +8,15 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import bgu.spl.net.impl.stomp.stompUser;
 
-public class ConnectionsImpl implements Connections<String>{
+public class ConnectionsImpl<T> implements Connections<T>{
 
     //fields:
     
-    public ConcurrentHashMap<ConnectionHandler<String>, ConcurrentHashMap<String,String>> cffonnectionsDB = new ConcurrentHashMap<>();//map<CH,map<Topic,subscriptionID> 
+    public ConcurrentHashMap<ConnectionHandler<String>, ConcurrentHashMap<String,String>> connectionsDB = new ConcurrentHashMap<>();//map<CH,map<Topic,subscriptionID> 
 
-    public ConcurrentHashMap<String, ConcurrentHashMap<stompUser,String>> subscriptionsDB = new ConcurrentHashMap<>();//map<topic,map<stompUser,subscriptionID>
+    public ConcurrentHashMap<String, ConcurrentHashMap<ConnectionHandler<T>,String>> subscriptionsDB = new ConcurrentHashMap<>();//map<topic,map<stompUser,subscriptionID>
     
-    private ConcurrentHashMap<String,String> usersNpasswords = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String,stompUser> users = new ConcurrentHashMap<>();  //map<userName,userOBJ>
 
     static int clientID;        //global (static)
     static int recieptID;        //global (static)
@@ -26,20 +26,21 @@ public class ConnectionsImpl implements Connections<String>{
     //TODO - Implement this class entirely - only implemented skelaton so i can referance Type ConnectionsImpl as a Type.
 
     //methods:
-    public boolean send(int connectionId, String msg){  //send to certain CH. needs to apply CH::send()
+    public boolean send(int connectionId, T msg){  //send to certain CH. needs to apply CH::send()
         
             return false;
     };
 
-    public void send(String channel, String msg){   //send ALL SUBSCRIBED! needs to apply CH::send()
+    public void send(String channel, T msgT){   //send ALL SUBSCRIBED! needs to apply CH::send()
         //note that the msg here is already translated frame2string!!!
         //also, because subscriptionID needed, i split and merge here:
+        String msg = (String)msgT;
         String[] splited = msg.split("FILLSUBSCRIPTIONHERE", 1);
-        Collection<ConnectionHandler<String>> registeredCHs = subscriptionsDB.get(channel).keySet();
-        for (ConnectionHandler<String> CH : registeredCHs) {
+        Collection<ConnectionHandler<T>> registeredCHs = subscriptionsDB.get(channel).keySet();
+        for (ConnectionHandler<T> CH : registeredCHs) {
             String subId = subscriptionsDB.get(channel).get(CH);    //get CHs subscription id
             msg = splited[0]+"subscription:"+subId+splited[1];      //chain it all to a new String
-            CH.send(msg);
+            CH.send((T)msg);
         }
     };
 
@@ -59,7 +60,7 @@ public class ConnectionsImpl implements Connections<String>{
         return true;
     }
 
-    public boolean addTopicToCH(ConnectionHandler<String> CH, String topic,String subscriptionID){     //add Topic to subscriptionDB (and to connectionsDB[CH]),part of SUBSCRIBE
+    public boolean addTopicToCH(ConnectionHandler<T> CH, String topic,String subscriptionID){     //add Topic to subscriptionDB (and to connectionsDB[CH]),part of SUBSCRIBE
         //add topic to connectionsDB:
         try{
             connectionsDB.get(CH).put(topic, subscriptionID);
@@ -67,7 +68,7 @@ public class ConnectionsImpl implements Connections<String>{
     
         //add CH and subID to subscriptionsDB
        
-        ConcurrentHashMap<ConnectionHandler<String>,String> innerMap = subscriptionsDB.computeIfAbsent(topic, k -> new ConcurrentHashMap<>());
+        ConcurrentHashMap<ConnectionHandler<T>,String> innerMap = subscriptionsDB.computeIfAbsent(topic, k -> new ConcurrentHashMap<>());
         innerMap.put(CH, subscriptionID);
         
         /*
@@ -92,9 +93,9 @@ public boolean removeCH(ConnectionHandler<String> CH){
 }
 
 public boolean isLoginOk(String login, String passcode) {
-    String realPassword = usersNpasswords.get(login);       //realPassword is the one already in the database
+    String realPassword = users.get(login).passcode;       //realPassword is the one already in the database
     if (realPassword==null){        //if its a new client
-        usersNpasswords.put(login, realPassword);
+        users.put(login, new stompUser(login,passcode ));
         return true;
     }
     if (realPassword!=passcode) return false;   //wrong password
