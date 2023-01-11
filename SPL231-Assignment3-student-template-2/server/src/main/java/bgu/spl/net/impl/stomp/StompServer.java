@@ -15,17 +15,17 @@ public class StompServer {
         ConnectionsImpl connections = new ConnectionsImpl();
 
         // you can use any server... 
-        Server.threadPerClient(
-                7777, //port
-                () ->   new StompProtocolImpl(feed,connections), //protocol factory
-                StompEncoderDecoder::new //message encoder decoder factory
-        ).serve();
-
-        // Server.reactor(
-        //         Runtime.getRuntime().availableProcessors(),
+        // Server.threadPerClient(
         //         7777, //port
-        //         () ->  new StompProtocolImpl(feed,connections), //protocol factory
+        //         () ->   new StompProtocolImpl(feed,connections), //protocol factory
         //         StompEncoderDecoder::new //message encoder decoder factory
         // ).serve();
+
+        Server.reactor(
+                Runtime.getRuntime().availableProcessors(),
+                7777, //port
+                () ->  new StompProtocolImpl(feed,connections), //protocol factory
+                StompEncoderDecoder::new //message encoder decoder factory
+        ).serve();
     }
 }

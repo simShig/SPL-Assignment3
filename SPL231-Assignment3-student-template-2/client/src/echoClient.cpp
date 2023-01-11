@@ -2,7 +2,8 @@
 #include "../include/ConnectionHandler.h"
 
 /*
-massage to proccess: SUBSCRIBE;F;headerName:headerValue;L;headerName2:sdsd;L;;F;msgBodyDSDFSDF;L;;F;\u0000
+massage to proccess: 
+SUBSCRIBE;F;headerName:headerValue;L;headerName2:sdsd;L;;F;msgBodyDSDFSDF;L;;F;\u0000
 */
 
 /**
