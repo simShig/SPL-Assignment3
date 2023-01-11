@@ -12,7 +12,7 @@ private:
 public:
 static int subID;
 static int receiptID;
-void MyProtocol = StompProtocol();
+//StompProtocol MyProtocol = StompProtocol();
 
 
 
