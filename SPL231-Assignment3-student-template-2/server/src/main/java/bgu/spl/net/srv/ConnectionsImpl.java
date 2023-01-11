@@ -6,13 +6,15 @@ import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import bgu.spl.net.impl.stomp.stompUser;
+
 public class ConnectionsImpl implements Connections<String>{
 
     //fields:
     
-    public ConcurrentHashMap<ConnectionHandler<String>, ConcurrentHashMap<String,String>> connectionsDB = new ConcurrentHashMap<>();//map<CH,map<Topic,subscriptionID> 
+    public ConcurrentHashMap<ConnectionHandler<String>, ConcurrentHashMap<String,String>> cffonnectionsDB = new ConcurrentHashMap<>();//map<CH,map<Topic,subscriptionID> 
 
-    public ConcurrentHashMap<String, ConcurrentHashMap<ConnectionHandler<String>,String>> subscriptionsDB = new ConcurrentHashMap<>();//map<topic,map<CH,subscriptionID>
+    public ConcurrentHashMap<String, ConcurrentHashMap<stompUser,String>> subscriptionsDB = new ConcurrentHashMap<>();//map<topic,map<stompUser,subscriptionID>
     
     private ConcurrentHashMap<String,String> usersNpasswords = new ConcurrentHashMap<>();
 

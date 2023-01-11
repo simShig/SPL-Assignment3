@@ -24,7 +24,9 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
     private String EndOfField = FrameFormat.EndOfField;
     private boolean shouldTerminate = false;
     private NewsFeed NewsDataStructure; 
-    private ConnectionsImpl ConnectionsDataStructure;  
+    private ConnectionsImpl ConnectionsDataStructure;
+    public stompUser activeUser;
+    public ConnectionHandler CH;
     
     // public void start(int connectionId, Connections<String> connections){   //someone in the group said Hadi allowed to delete it
     //     return;
@@ -32,6 +34,7 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
     public StompProtocolImpl (NewsFeed NDS, ConnectionsImpl CDS){   //CONSTRUCTOR - inspired by RCIprotocol
         NewsDataStructure = NDS;
         ConnectionsDataStructure = CDS;
+        activeUser = new stompUser("fake", "fake");     //only for initializing
     }
     
     public String process(String  msg){           //SMP interface method
