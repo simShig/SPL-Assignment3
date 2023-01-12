@@ -1,5 +1,8 @@
 package bgu.spl.net.impl.stomp;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import bgu.spl.net.srv.ConnectionHandler;
+
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -8,7 +11,8 @@ public class stompUser {
     public String userName;
     public String passcode;
     ConcurrentHashMap<String,LinkedList<String>> userReportsByGame;     //map<gameName,linkedlist<reportsAsString>>
-    ConcurrentHashMap<String,String> userSubscriptions;
+    ConcurrentHashMap<String,String> userSubscriptions; // map <topic,subscriptionID>
+    public ConnectionHandler currentCH = null;
 
 public stompUser(String uName,String uPass){
     this.userName = uName;

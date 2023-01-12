@@ -193,6 +193,7 @@ private FrameFormat connectCMD (FrameFormat recievedFrame, ConnectionHandler<Str
     if (isLoginOk){
         //change CH::activeUser to logged user:
         CH.setActiveUser(login);
+        CH.setConnectionId(ConnectionsImpl.connectionID++);
         //add CH to connections
         ConnectionsDataStructure.addCHtoDB(CH);
     //response if ok:

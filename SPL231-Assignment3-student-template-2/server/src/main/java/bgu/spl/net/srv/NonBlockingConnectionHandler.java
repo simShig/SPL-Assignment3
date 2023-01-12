@@ -28,6 +28,7 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
     public String login=null;
     public String password=null;
     public String activeUserName = null;
+    public int connectionId=0;
 
     public NonBlockingConnectionHandler(
             StompEncoderDecoder reader,
@@ -39,12 +40,16 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
         this.protocol = protocol;
         this.reactor = reactor;
     }
+    
+    public void setConnectionId(int id) {
+        this.connectionId = id;        
+    }
 
     public void setActiveUser(String username) {
         activeUserName = username;
         
     }
-    
+
     public Runnable continueRead() {
         ByteBuffer buf = leaseBuffer();
 
@@ -131,6 +136,27 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
 
     @Override
     public void send(T msg) {
-        //IMPLEMENT IF NEEDED
+        ByteBuffer buf = leaseBuffer();
+        try {
+
+                    String response =(String) msg;
+                    if (response != null) {
+                        writeQueue.add(ByteBuffer.wrap(encdec.encode(response)));
+                        reactor.updateInterestedOps(chan, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
+                    }
+
+        } finally {
+            releaseBuffer(buf);
+        }
+    }
+
+    @Override
+    public int getConnectionID() {
+        return this.connectionId;
+    }
+
+    @Override
+    public String getActiveUser() {
+                return this.activeUserName;
     }
 }

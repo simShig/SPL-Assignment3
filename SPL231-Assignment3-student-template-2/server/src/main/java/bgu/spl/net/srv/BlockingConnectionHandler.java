@@ -72,13 +72,40 @@ public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler
     }
 
     @Override
+    
     public void send(T msg) {
-        //IMPLEMENT IF NEEDED
+        try (Socket sock = this.sock) { //just for automatic closing
+            out = new BufferedOutputStream(sock.getOutputStream());
+            // System.out.println("inside CH - finished sock.getoutput"+ out);
+            String response = (String)msg;
+                if (response != null) {
+                        out.write(encdec.encode(response));
+                        out.flush();
+                    }           
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     @Override
     public void setActiveUser(String username) {
         activeUserName = username;
         
+    }
+
+    @Override
+    public void setConnectionId(int id) {
+        this.connectionId = id;        
+    }
+
+    @Override
+    public int getConnectionID() {
+        return this.connectionId;
+    }
+
+    @Override
+    public String getActiveUser() {
+        return this.activeUserName;
     }
 }

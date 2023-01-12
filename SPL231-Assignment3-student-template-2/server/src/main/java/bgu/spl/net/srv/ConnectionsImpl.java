@@ -12,12 +12,12 @@ public class ConnectionsImpl<T> implements Connections<T>{
 
     //fields:
     
-    public ConcurrentHashMap<ConnectionHandler<String>, ConcurrentHashMap<String,String>> connectionsDB = new ConcurrentHashMap<>();//map<CH,map<Topic,subscriptionID> 
+    public ConcurrentHashMap<ConnectionHandler<T>, ConcurrentHashMap<String,String>> connectionsDB = new ConcurrentHashMap<>();//map<CH,map<Topic,subscriptionID> 
 
-    public ConcurrentHashMap<String, ConcurrentHashMap<ConnectionHandler<T>,String>> subscriptionsDB = new ConcurrentHashMap<>();//map<topic,map<stompUser,subscriptionID>
+    public ConcurrentHashMap<String, ConcurrentHashMap<ConnectionHandler<T>,String>> subscriptionsDB = new ConcurrentHashMap<>();//map<topic,map<CH,subscriptionID>
     
     private ConcurrentHashMap<String,stompUser> users = new ConcurrentHashMap<>();  //map<userName,userOBJ>
-
+    public static int connectionID = 1;
     static int clientID;        //global (static)
     static int recieptID;        //global (static)
     public static int massageID;           //global (static)
@@ -27,14 +27,30 @@ public class ConnectionsImpl<T> implements Connections<T>{
 
     //methods:
     public boolean send(int connectionId, T msg){  //send to certain CH. needs to apply CH::send()
-        
-            return false;
-    };
+    Collection<ConnectionHandler<T>> registeredCHs = connectionsDB.keySet(); 
+    for (ConnectionHandler<T> CH : registeredCHs) {
+        if(CH.getConnectionID()==connectionId){
+            CH.send(msg);
+            return true;
+        }
+
+    } return false;
+}
 
     public void send(String channel, T msgT){   //send ALL SUBSCRIBED! needs to apply CH::send()
         //note that the msg here is already translated frame2string!!!
         //also, because subscriptionID needed, i split and merge here:
         String msg = (String)msgT;
+
+
+        ///continue FROM HERREEEEE~!~!@#!#$@!#$#R@$ 
+        //check every proccess(CMD) method
+        //in the end - implement setters and getters in CH (interface&blocking,non-blocking)
+
+
+
+
+
         String[] splited = msg.split("FILLSUBSCRIPTIONHERE", 1);
         Collection<ConnectionHandler<T>> registeredCHs = subscriptionsDB.get(channel).keySet();
         for (ConnectionHandler<T> CH : registeredCHs) {
