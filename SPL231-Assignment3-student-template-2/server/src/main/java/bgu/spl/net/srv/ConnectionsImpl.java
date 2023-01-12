@@ -2,6 +2,7 @@ package bgu.spl.net.srv;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -12,9 +13,9 @@ public class ConnectionsImpl<T> implements Connections<T>{
 
     //fields:
     
-    public ConcurrentHashMap<ConnectionHandler<T>, ConcurrentHashMap<String,String>> connectionsDB = new ConcurrentHashMap<>();//map<CH,map<Topic,subscriptionID> 
+    public ConcurrentHashMap<String,ConnectionHandler<T>> connectionsDB = new ConcurrentHashMap<>();//map<connecitonID,CH>
 
-    public ConcurrentHashMap<String, ConcurrentHashMap<ConnectionHandler<T>,String>> subscriptionsDB = new ConcurrentHashMap<>();//map<topic,map<CH,subscriptionID>
+    public ConcurrentHashMap<String,LinkedList<stompUser>> subscriptionsDB = new ConcurrentHashMap<>();//map<topic,LinkedList<stompUsers>>
     
     private ConcurrentHashMap<String,stompUser> users = new ConcurrentHashMap<>();  //map<userName,userOBJ>
     public static int connectionID = 1;
@@ -27,48 +28,37 @@ public class ConnectionsImpl<T> implements Connections<T>{
 
     //methods:
     public boolean send(int connectionId, T msg){  //send to certain CH. needs to apply CH::send()
-    Collection<ConnectionHandler<T>> registeredCHs = connectionsDB.keySet(); 
-    for (ConnectionHandler<T> CH : registeredCHs) {
-        if(CH.getConnectionID()==connectionId){
-            CH.send(msg);
-            return true;
-        }
+        ConnectionHandler<T> CH = connectionsDB.get(connectionId);
+        if (CH==null) return false;
+        CH.send(msg);
+        return true;
+    }
 
-    } return false;
-}
 
     public void send(String channel, T msgT){   //send ALL SUBSCRIBED! needs to apply CH::send()
         //note that the msg here is already translated frame2string!!!
         //also, because subscriptionID needed, i split and merge here:
-        String msg = (String)msgT;
-
-
-        ///continue FROM HERREEEEE~!~!@#!#$@!#$#R@$ 
-        //check every proccess(CMD) method
-        //in the end - implement setters and getters in CH (interface&blocking,non-blocking)
-
-
-
-
-
+        String msg = (String)msgT;      
         String[] splited = msg.split("FILLSUBSCRIPTIONHERE", 1);
-        Collection<ConnectionHandler<T>> registeredCHs = subscriptionsDB.get(channel).keySet();
-        for (ConnectionHandler<T> CH : registeredCHs) {
-            String subId = subscriptionsDB.get(channel).get(CH);    //get CHs subscription id
-            msg = splited[0]+"subscription:"+subId+splited[1];      //chain it all to a new String
-            CH.send((T)msg);
+        LinkedList<stompUser> subscribedUsers = subscriptionsDB.get(channel);
+        for (stompUser user : subscribedUsers) {
+            String subId = user.userSubscriptions.get(channel); //get users subId to topic
+            msg = splited[0]+subId+splited[1];      //chain it all to a new String
+            user.currentCH.send(msg);
         }
     };
-
+    
     public void disconnect(int connectionId){
-
+        connectionsDB.remove(connectionId);
     };
 
-    public boolean addCHtoDB(ConnectionHandler<String> CH){     //add ConnectionHandler to connectionsDB,part of CONNECT
-    
-       connectionsDB.computeIfAbsent(CH, k -> new ConcurrentHashMap<>());    //
+    public boolean addCHtoDB(ConnectionHandler<T> CH){     //add ConnectionHandler to connectionsDB,part of CONNECT
+        connectionsDB.put(new String(""+ConnectionsImpl.connectionID++), CH);
         return true;
     };
+
+            // continue from here!!!!
+
 
     public boolean removeTopic_CH_Topic (ConnectionHandler<String> CH, String topic){   //removes topic from CH and CH from TOPIC
         connectionsDB.get(CH).remove(topic);

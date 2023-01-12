@@ -11,8 +11,8 @@ public class stompUser {
     public String userName;
     public String passcode;
     ConcurrentHashMap<String,LinkedList<String>> userReportsByGame;     //map<gameName,linkedlist<reportsAsString>>
-    ConcurrentHashMap<String,String> userSubscriptions; // map <topic,subscriptionID>
-    public ConnectionHandler currentCH = null;
+    public ConcurrentHashMap<String,String> userSubscriptions; // map <topic,subscriptionID>
+    public ConnectionHandler<String> currentCH = null;
 
 public stompUser(String uName,String uPass){
     this.userName = uName;

@@ -240,8 +240,8 @@ private FrameFormat sendCMD (FrameFormat recievedFrame, ConnectionHandler<String
     //add headersList:
     LinkedList<LinkedList<String>> stompHeaders=new LinkedList<>();
     LinkedList<String> pair = new LinkedList<>();
-    pair.add("FILLSUBSCRIPTIONHERE");      //will be added inside connectionsImpl::send() because subscription id of the specific client is needed.
-    pair.addLast("");   //because subscription id is unique for each CH, it will be added inside send()
+    pair.add("subscription-id");      //will be added inside connectionsImpl::send() because subscription id of the specific client is needed.
+    pair.addLast("FILLSUBSCRIPTIONHERE");   //because subscription id is unique for each CH, it will be added inside send()
     stompHeaders.add(pair);
 
     pair = new LinkedList<>();
