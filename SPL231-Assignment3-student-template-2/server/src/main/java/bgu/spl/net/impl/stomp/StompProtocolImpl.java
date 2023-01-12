@@ -6,13 +6,13 @@ package bgu.spl.net.impl.stomp;
 
 import bgu.spl.net.api.StompMessagingProtocol;
 import bgu.spl.net.impl.newsfeed.NewsFeed;
-import bgu.spl.net.srv.BlockingConnectionHandler;
+// import bgu.spl.net.srv.BlockingConnectionHandler;
 import bgu.spl.net.srv.ConnectionHandler;
 import bgu.spl.net.srv.ConnectionsImpl;
 
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.concurrent.ConcurrentHashMap;
+// import java.util.concurrent.ConcurrentHashMap;
 
 
 
@@ -161,7 +161,7 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
 
 private FrameFormat subscribeCMD  (FrameFormat recievedFrame, ConnectionHandler<String> CH){
     String topic = recievedFrame.headerName2Value("destination:");  //gets headerName,returns headerValue (null if not found) 
-    String msgBody = recievedFrame.FrameBody;
+    // String msgBody = recievedFrame.FrameBody;
     String recieptID = recievedFrame.headerName2Value("recieptID");
     String subscriptionID = recievedFrame.headerName2Value("id");
     stompUser activeUser = ConnectionsDataStructure.users.get(CH.getActiveUser());
@@ -253,6 +253,8 @@ private FrameFormat sendCMD (FrameFormat recievedFrame, ConnectionHandler<String
     String msgBody = recievedFrame.FrameBody;
     String recieptID = recievedFrame.headerName2Value("recieptID");
     stompUser activeUser = ConnectionsDataStructure.users.get(CH.getActiveUser());
+    activeUser.userReportsByGame.putIfAbsent(topic, new LinkedList<String>());
+    activeUser.userReportsByGame.get(topic).add(msgBody);
     //check if subscribed to the desired topic
     if (!ConnectionsDataStructure.subscriptionsDB.get(topic).contains(activeUser)) return ErrorFrame(recievedFrame," error while SEND","couldnt fint relevant user in subscriptions");
     //add publishing to newsFeed
@@ -266,6 +268,11 @@ private FrameFormat sendCMD (FrameFormat recievedFrame, ConnectionHandler<String
     LinkedList<String> pair = new LinkedList<>();
     pair.add("subscription-id");      //will be added inside connectionsImpl::send() because subscription id of the specific client is needed.
     pair.addLast("FILLSUBSCRIPTIONHERE");   //because subscription id is unique for each CH, it will be added inside send()
+    stompHeaders.add(pair);
+
+    pair = new LinkedList<>();
+    pair.add("user");   //the user who published the massage:
+    pair.addLast(CH.getActiveUser());
     stompHeaders.add(pair);
 
     pair = new LinkedList<>();
