@@ -9,6 +9,8 @@ import bgu.spl.net.impl.newsfeed.NewsFeed;
 import bgu.spl.net.srv.BlockingConnectionHandler;
 import bgu.spl.net.srv.ConnectionHandler;
 import bgu.spl.net.srv.ConnectionsImpl;
+
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -21,18 +23,18 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
     private boolean shouldTerminate = false;
     private NewsFeed NewsDataStructure; 
     private ConnectionsImpl<String> ConnectionsDataStructure;
-    
-    public ConnectionHandler myCH = null;
+    public ConnectionHandler<String> myCH = null;       //assigned later by the connectionHandler itself
     
     // public void start(int connectionId, Connections<String> connections){   //someone in the group said Hadi allowed to delete it
     //     return;
     // };
+
     public StompProtocolImpl (NewsFeed NDS, ConnectionsImpl<String> CDS){   //CONSTRUCTOR - inspired by RCIprotocol
         NewsDataStructure = NDS;
         ConnectionsDataStructure = CDS;
     }
     
-    public boolean setCH(ConnectionHandler<String> CH){
+    public boolean setCH(ConnectionHandler<String> CH){     //used by blocking/nonBlocking connectionHandlers to set protocols myCH
         myCH = CH;
         return true;
     }
@@ -40,40 +42,54 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
     public String process(String  msg){           //SMP interface method
         //message PARSE() method                  //TODO - method to parse the massage 
        
-       //something weird -when we get a massage it starts it with second char (miss the first one...)
-
-                    System.out.println("the massage proccessing now: "+msg);//for debug
+        print4Debug("im in StompProtocolImpl::proccess: ");
 
         ConnectionHandler<String> CH = myCH;    //the ConnectionHandler of the client from whom the massage is recieved.
         FrameFormat recievedFrame =string2Frame(msg);
         FrameFormat responseFrame = null;
         switch (recievedFrame.stompCommand){
             case ("SUBSCRIBE"):
-            System.out.print("im in SUBSCRIBE case");    
                 responseFrame = subscribeCMD(recievedFrame, CH);
-                 break;
+                print4Debug("SUBSCRIBE executed:"); 
+                break;
             case ("UNSUBSCRIBE"):
                  responseFrame = unsubscribeCMD(recievedFrame,CH);
+                 print4Debug("UNSUBSCRIBE executed:"); 
                  break;
             case ("CONNECT"):
                  responseFrame = connectCMD(recievedFrame,CH);
+                 print4Debug("CONNECT executed:"); 
                  break;
             case ("DISCONNECT"):
                  responseFrame = disconnectCMD(recievedFrame,CH);
+                 print4Debug("DISCONNECT executed:"); 
                  break;
             case ("SEND"):
                  responseFrame = sendCMD(recievedFrame,CH);
+                 print4Debug("SEND executed:"); 
                  break;
             default:
-            System.out.print("im in Deafult case");    
             responseFrame=ErrorFrame(recievedFrame," short explanation","Error Massage Body!!!");  //return ERROR
-
-            
+            print4Debug("ERROR (no relevant stompHeader) executed:"); 
+           
         }
         return frame2String(responseFrame);
         
     };
 	
+
+    private void print4Debug(String header) {   //prints information regarding DBs for debbuging
+    //header:
+    System.out.println("~~~~~~~~~~~~~~~~~~~~~\n"+header+"~~~~~~~~~~~~~~~~~~~~~\n");
+    System.out.println("connectionsDB:\n    "+ConnectionsDataStructure.connectionsDB);
+    System.out.println("subscriptionsDB:\n    "+ConnectionsDataStructure.subscriptionsDB);
+    System.out.println("users:\n    "+ConnectionsDataStructure.users);
+    System.out.println("reports:\n    "+NewsDataStructure+"\n");
+
+
+
+
+    }
 
     public boolean shouldTerminate(){           // SMP interface method
         //shouldTerminate = true;
@@ -148,18 +164,19 @@ private FrameFormat subscribeCMD  (FrameFormat recievedFrame, ConnectionHandler<
     String msgBody = recievedFrame.FrameBody;
     String recieptID = recievedFrame.headerName2Value("recieptID");
     String subscriptionID = recievedFrame.headerName2Value("id");
-    if (subscriptionID==null) return ErrorFrame(recievedFrame," short explanation","Error Massage Body!!!");
-    //add CH to topic (in subscriptions):
-    boolean flag = ConnectionsDataStructure.addTopicToCH(CH, topic, subscriptionID);
+    stompUser activeUser = ConnectionsDataStructure.users.get(CH.getActiveUser());
+    if (subscriptionID==null) return ErrorFrame(recievedFrame,"no relevant subscription ID","Error Massage Body!!!");
+    //add user to topic (in subscriptions):
+    boolean flag = ConnectionsDataStructure.addTopicToUser(activeUser, topic, subscriptionID);
     //add topic to CH (in connections):
     if (flag){
         ConnectionsDataStructure.addCHtoDB(CH);
-        ConnectionsDataStructure.connectionsDB.get(CH).put(topic, subscriptionID);
+        activeUser.userSubscriptions.put(topic, subscriptionID);
     }
     
     //response if error:
         //no subscriptionId sent - error as written upstairs.
-    if (!flag) return ErrorFrame(recievedFrame," short explanation","Error Massage Body!!!");
+    if (!flag) return ErrorFrame(recievedFrame," Error adding topic to user subscriptions","Error Massage Body!!!");
 
     //response if ok:
     if (recieptID!=null) return RecieptFrame(recieptID,CH);    
@@ -171,20 +188,17 @@ private FrameFormat unsubscribeCMD (FrameFormat recievedFrame, ConnectionHandler
     // String msgBody = recievedFrame.FrameBody;
     String recieptID = recievedFrame.headerName2Value("recieptID");
     String subscriptionID = recievedFrame.headerName2Value("id");
-    if (subscriptionID==null) return ErrorFrame(recievedFrame," short explanation","Error Massage Body!!!");
-    //remove CH from topic (in subscriptions) and remove topic from CH (in connections):
-    ConnectionsDataStructure.removeTopic_CH_Topic(CH, topic);
+    if (subscriptionID==null) return ErrorFrame(recievedFrame,"no relevant subscription ID","Error Massage Body!!!");
+    //remove user from topic (in subscriptions) and remove topic from user (in connections):
+    ConnectionsDataStructure.removeTopic_User_Topic(CH.getActiveUser(), topic);
     //response if ok:
     if (recieptID!=null) return RecieptFrame(recieptID,CH);    
     //response if error:
-
     return null;
 }
 
 
 private FrameFormat connectCMD (FrameFormat recievedFrame, ConnectionHandler<String> CH){
-    String topic = recievedFrame.headerName2Value("destination:");  //gets headerName,returns headerValue (null if not found) 
-    String msgBody = recievedFrame.FrameBody;
     String versionID = recievedFrame.headerName2Value("version-id");
     String login = recievedFrame.headerName2Value("login");
     String passcode = recievedFrame.headerName2Value("passcode");
@@ -207,16 +221,25 @@ private FrameFormat connectCMD (FrameFormat recievedFrame, ConnectionHandler<Str
         return ConnectedResponseFrame;
     }
     //response if error:
-    else return ErrorFrame(recievedFrame," short explanation","Error Massage Body!!!");
+    else return ErrorFrame(recievedFrame,"Login error - CONNECT not succesfull","something went wrong during CONNECT");
    // return null;
 }
+
+
 
 private FrameFormat disconnectCMD (FrameFormat recievedFrame,ConnectionHandler<String> CH){
     // String topic = recievedFrame.headerName2Value("destination:");  //gets headerName,returns headerValue (null if not found) 
     // String msgBody = recievedFrame.FrameBody;
     String recieptID = recievedFrame.headerName2Value("recieptID");
     //check if CH has activ subscriptions, if TRUE - unsubscribe
-    ConnectionsDataStructure.removeCH(CH);      //remove from connectionsDB, if has subscriptions - unsubscribe from all
+    stompUser activeUser = ConnectionsDataStructure.users.get(CH.getActiveUser());
+    Collection<String> userTopics = activeUser.userSubscriptions.keySet();
+    for (String topic : userTopics) {
+        ConnectionsDataStructure.removeTopic_User_Topic(CH.getActiveUser(),topic);      //remove from connectionsDB, if has subscriptions - unsubscribe from all
+    } 
+    //remove active user from users,and from CH 
+    ConnectionsDataStructure.users.remove(CH.getActiveUser());
+    CH.setActiveUser(null);
     //response if ok:
     FrameFormat response = RecieptFrame(recieptID, CH);
     //response if error:
@@ -229,8 +252,9 @@ private FrameFormat sendCMD (FrameFormat recievedFrame, ConnectionHandler<String
     String topic = recievedFrame.headerName2Value("destination:");  //gets headerName,returns headerValue (null if not found) 
     String msgBody = recievedFrame.FrameBody;
     String recieptID = recievedFrame.headerName2Value("recieptID");
+    stompUser activeUser = ConnectionsDataStructure.users.get(CH.getActiveUser());
     //check if subscribed to the desired topic
-    if (!ConnectionsDataStructure.subscriptionsDB.get(topic).contains(CH)) return ErrorFrame(recievedFrame," short explanation","Error Massage Body!!!");
+    if (!ConnectionsDataStructure.subscriptionsDB.get(topic).contains(activeUser)) return ErrorFrame(recievedFrame," error while SEND","couldnt fint relevant user in subscriptions");
     //add publishing to newsFeed
     NewsDataStructure.publish(topic, msgBody);
 
@@ -268,7 +292,7 @@ private FrameFormat sendCMD (FrameFormat recievedFrame, ConnectionHandler<String
 
 
 
-private FrameFormat RecieptFrame(String recieptID, ConnectionHandler CH) {
+private FrameFormat RecieptFrame(String recieptID, ConnectionHandler<String> CH) {
     FrameFormat recieptResponseFrame = new FrameFormat("RECIEPT", null, null);
     if (recieptID!=null){        //add reciept header if needed.
         LinkedList<LinkedList<String>> stompHeaders=new LinkedList<>();
