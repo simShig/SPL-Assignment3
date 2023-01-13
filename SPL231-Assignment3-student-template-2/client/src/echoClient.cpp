@@ -4,6 +4,8 @@
 /*
 massage to proccess: 
 SUBSCRIBE;F;headerName:headerValue;L;headerName2:sdsd;L;;F;msgBodyDSDFSDF;L;;F;\u0000
+CONNECT;F;login:SimonShig;L;passcode:1234;F; \u0000
+login;F;1.1.2.3:7777;L;login:simon;L;passcode:qweasd;F; \u0000
 */
 
 /**

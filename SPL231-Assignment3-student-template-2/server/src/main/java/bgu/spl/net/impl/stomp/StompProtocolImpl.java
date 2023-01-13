@@ -41,7 +41,7 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
 
     public String process(String  msg){           //SMP interface method
         //message PARSE() method                  //TODO - method to parse the massage 
-       
+        ConnectionsDataStructure.users.put("sdf",new stompUser("sdf", "vcbcvb"));
         print4Debug("im in StompProtocolImpl::proccess: ");
 
         ConnectionHandler<String> CH = myCH;    //the ConnectionHandler of the client from whom the massage is recieved.
@@ -58,6 +58,7 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
                  break;
             case ("CONNECT"):
                  responseFrame = connectCMD(recievedFrame,CH);
+                 ConnectionsDataStructure.users.put("testNAME", new stompUser("testNamee", "1234"));
                  print4Debug("CONNECT executed:"); 
                  break;
             case ("DISCONNECT"):

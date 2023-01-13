@@ -92,13 +92,14 @@ public class ConnectionsImpl<T> implements Connections<T>{
 // }
 
 public boolean isLoginOk(String login, String passcode) {
-    stompUser user =  users.get(login);
-    if (user==null){
-        users.put(login, new stompUser(login, passcode));
-        return true;
-    }else{
+    try{
+
+        stompUser user =  users.get(login);
         String realPassword = user.passcode;       //realPassword is the one already in the database
         if (realPassword!=passcode) return false;   //wrong password
+        return true;
+    }catch (NullPointerException e){
+        users.put(login, new stompUser(login, passcode));       //if couldnt find this one
     }
     return true;
 }
