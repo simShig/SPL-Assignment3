@@ -102,7 +102,6 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
  * ~~~~~~~~~String2Frame2String:~~~~~~~~~~~~~~~~~~~:
  */
 
-
     public FrameFormat string2Frame (String str){               //transforms msg back to frame
         String[] splitByFields = str.split(EndOfField);
                                 System.out.println("EndOfField delimiter is: "+EndOfField);//for DEBUG
@@ -213,12 +212,13 @@ private FrameFormat connectCMD (FrameFormat recievedFrame, ConnectionHandler<Str
         ConnectionsDataStructure.addCHtoDB(CH);
     //response if ok:
         FrameFormat ConnectedResponseFrame = new FrameFormat("CONNECTED",null,null);
-        LinkedList<LinkedList<String>> stompHeaders=new LinkedList<>();
-        LinkedList<String> pair = new LinkedList<>();
-        pair.add("version-id");
-        pair.addLast(""+versionID);
-        stompHeaders.add(pair);
-        ConnectedResponseFrame.stompHeaders=stompHeaders;
+        // LinkedList<LinkedList<String>> stompHeaders=new LinkedList<>();
+        ConnectedResponseFrame.addHeaders("version-id", ""+versionID);
+        // LinkedList<String> pair = new LinkedList<>();
+        // pair.add("version-id");
+        // pair.addLast(""+versionID);
+        // stompHeaders.add(pair);
+        // ConnectedResponseFrame.stompHeaders=stompHeaders;
         return ConnectedResponseFrame;
     }
     //response if error:
@@ -265,28 +265,32 @@ private FrameFormat sendCMD (FrameFormat recievedFrame, ConnectionHandler<String
     FrameFormat massageFrame = new FrameFormat("MESSAGE", null, msgBody);
     
     //add headersList:
-    LinkedList<LinkedList<String>> stompHeaders=new LinkedList<>();
-    LinkedList<String> pair = new LinkedList<>();
-    pair.add("subscription-id");      //will be added inside connectionsImpl::send() because subscription id of the specific client is needed.
-    pair.addLast("FILLSUBSCRIPTIONHERE");   //because subscription id is unique for each CH, it will be added inside send()
-    stompHeaders.add(pair);
+    massageFrame.addHeaders("subscription-id", "FILLSUBSCRIPTIONHERE");//will be added inside connectionsImpl::send() because subscription id of the specific client is needed.
+    massageFrame.addHeaders("user", CH.getActiveUser());    //the user who published the massage:
+    massageFrame.addHeaders("message-id", ""+ConnectionsImpl.massageID++);
+    massageFrame.addHeaders("destination",topic);
+    // LinkedList<LinkedList<String>> stompHeaders=new LinkedList<>();
+    // LinkedList<String> pair = new LinkedList<>();
+    // pair.add("subscription-id");      //will be added inside connectionsImpl::send() because subscription id of the specific client is needed.
+    // pair.addLast("FILLSUBSCRIPTIONHERE");   //because subscription id is unique for each CH, it will be added inside send()
+    // stompHeaders.add(pair);
 
-    pair = new LinkedList<>();
-    pair.add("user");   //the user who published the massage:
-    pair.addLast(CH.getActiveUser());
-    stompHeaders.add(pair);
+    // pair = new LinkedList<>();
+    // pair.add("user");   //the user who published the massage:
+    // pair.addLast(CH.getActiveUser());
+    // stompHeaders.add(pair);
 
-    pair = new LinkedList<>();
-    pair.add("message-id");
-    pair.addLast(""+ConnectionsImpl.massageID++);
-    stompHeaders.add(pair);
+    // pair = new LinkedList<>();
+    // pair.add("message-id");
+    // pair.addLast(""+ConnectionsImpl.massageID++);
+    // stompHeaders.add(pair);
 
-    pair = new LinkedList<>();
-    pair.add("destination");
-    pair.addLast(topic);
-    stompHeaders.add(pair);
+    // pair = new LinkedList<>();
+    // pair.add("destination");
+    // pair.addLast(topic);
+    // stompHeaders.add(pair);
 
-    massageFrame.stompHeaders=stompHeaders;
+    // massageFrame.stompHeaders=stompHeaders;
     //send publishing to all subscribed clients (inside the method -  adding subscription id))
     String partialMessage = frame2String(massageFrame);
     ConnectionsDataStructure.send(topic, partialMessage);      //sends each of subscribed CH the massage, using CH::send()
@@ -303,12 +307,13 @@ private FrameFormat sendCMD (FrameFormat recievedFrame, ConnectionHandler<String
 private FrameFormat RecieptFrame(String recieptID, ConnectionHandler<String> CH) {
     FrameFormat recieptResponseFrame = new FrameFormat("RECIEPT", null, null);
     if (recieptID!=null){        //add reciept header if needed.
-        LinkedList<LinkedList<String>> stompHeaders=new LinkedList<>();
-        LinkedList<String> pair = new LinkedList<>();
-        pair.add("receipt-id");
-        pair.addLast(""+recieptID);
-        stompHeaders.add(pair);
-        recieptResponseFrame.stompHeaders=stompHeaders;
+        recieptResponseFrame.addHeaders("receipt-id",""+recieptID);
+        // LinkedList<LinkedList<String>> stompHeaders=new LinkedList<>();
+        // LinkedList<String> pair = new LinkedList<>();
+        // pair.add("receipt-id");
+        // pair.addLast(""+recieptID);
+        // stompHeaders.add(pair);
+        // recieptResponseFrame.stompHeaders=stompHeaders;
     }
     return null;
 }
@@ -320,15 +325,18 @@ private FrameFormat ErrorFrame(FrameFormat recievedFrame,String errorMsgHeader,S
     FrameFormat errorResponseFrame = new FrameFormat("Error",null, errorMsgBody);
     errorResponseFrame.stompHeaders = new LinkedList<>();
     //first header - reciept-id
-    LinkedList<String> pair = new LinkedList<>();
-    pair.add("receipt-id");
-    pair.addLast(""+recieptID);
-    errorResponseFrame.stompHeaders.add(pair);
+    if (recieptID!=null) errorResponseFrame.addHeaders("receipt-id", ""+recieptID);
+    // LinkedList<String> pair = new LinkedList<>();
+    // pair.add("receipt-id");
+    // pair.addLast(""+recieptID);
+    // errorResponseFrame.stompHeaders.add(pair);
+
     //second header - message (short explanation)
-    pair = new LinkedList<>();
-    pair.add("message: ");
-    pair.addLast(""+errorMsgHeader);
-    errorResponseFrame.stompHeaders.add(pair);
+    errorResponseFrame.addHeaders("message: ", ""+errorMsgHeader);
+    // pair = new LinkedList<>();
+    // pair.add("message: ");
+    // pair.addLast(""+errorMsgHeader);
+    // errorResponseFrame.stompHeaders.add(pair);
 
     //msgBody:
     String responseFrameMsgBody = 

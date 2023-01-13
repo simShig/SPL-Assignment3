@@ -73,6 +73,12 @@ public String headerName2Value (String headerName){ //gets headerName,returns he
     return null;
 }
 
-
+public boolean addHeaders (String headerName,String headerValue){
+    LinkedList<String> pair = new LinkedList<>();
+        pair.add(headerName);
+        pair.addLast(headerValue);
+        stompHeaders.add(pair);
+    return true;
+}
 
 }
