@@ -142,7 +142,7 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
         ans+=EndOfField;
     
     //add body:
-        ans+= frame.FrameBody+EndOfField +" ";
+        ans+= frame.FrameBody +" ";
     //add EOM:
         ans+=frame.EndOfMassage;
         return ans;
@@ -159,9 +159,9 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
 //SUBSCRIBE:
 
 private FrameFormat subscribeCMD  (FrameFormat recievedFrame, ConnectionHandler<String> CH){
-    String topic = recievedFrame.headerName2Value("destination:");  //gets headerName,returns headerValue (null if not found) 
+    String topic = recievedFrame.headerName2Value("destination");  //gets headerName,returns headerValue (null if not found) 
     // String msgBody = recievedFrame.FrameBody;
-    String recieptID = recievedFrame.headerName2Value("recieptID");
+    String recieptID = recievedFrame.headerName2Value("receipt-id");
     String subscriptionID = recievedFrame.headerName2Value("id");
     stompUser activeUser = ConnectionsDataStructure.users.get(CH.getActiveUser());
     if (subscriptionID==null) return ErrorFrame(recievedFrame,"no relevant subscription ID","Error Massage Body!!!");
@@ -178,22 +178,23 @@ private FrameFormat subscribeCMD  (FrameFormat recievedFrame, ConnectionHandler<
     if (!flag) return ErrorFrame(recievedFrame," Error adding topic to user subscriptions","Error Massage Body!!!");
 
     //response if ok:
-    if (recieptID!=null) return RecieptFrame(recieptID,CH);    
-    return null;
+    //if (recieptID!=null) RecieptFrame(recieptID,CH);    
+    return RecieptFrame(recieptID,CH);
 }
 
 private FrameFormat unsubscribeCMD (FrameFormat recievedFrame, ConnectionHandler<String> CH){
-    String topic = recievedFrame.headerName2Value("destination:");  //gets headerName,returns headerValue (null if not found) 
-    // String msgBody = recievedFrame.FrameBody;
-    String recieptID = recievedFrame.headerName2Value("recieptID");
+    stompUser activeUser = ConnectionsDataStructure.users.get(CH.getActiveUser());
     String subscriptionID = recievedFrame.headerName2Value("id");
+    String topic = activeUser.getTopicBySubId(subscriptionID);  //use user method to get topic by subID
+    // String msgBody = recievedFrame.FrameBody;
+    String recieptID = recievedFrame.headerName2Value("receipt-id");
     if (subscriptionID==null) return ErrorFrame(recievedFrame,"no relevant subscription ID","Error Massage Body!!!");
     //remove user from topic (in subscriptions) and remove topic from user (in connections):
     ConnectionsDataStructure.removeTopic_User_Topic(CH.getActiveUser(), topic);
     //response if ok:
-    if (recieptID!=null) return RecieptFrame(recieptID,CH);    
-    //response if error:
-    return null;
+    //if (recieptID!=null) return RecieptFrame(recieptID,CH);    
+    
+    return RecieptFrame(recieptID,CH);
 }
 
 
@@ -210,6 +211,8 @@ private FrameFormat connectCMD (FrameFormat recievedFrame, ConnectionHandler<Str
         CH.setConnectionId(ConnectionsImpl.connectionID++);
         //add CH to connections
         ConnectionsDataStructure.addCHtoDB(CH);
+        stompUser activeUser = ConnectionsDataStructure.users.get(CH.getActiveUser());
+        activeUser.isConnected = true;
     //response if ok:
         FrameFormat ConnectedResponseFrame = new FrameFormat("CONNECTED",null,null);
         // LinkedList<LinkedList<String>> stompHeaders=new LinkedList<>();
@@ -231,9 +234,10 @@ private FrameFormat connectCMD (FrameFormat recievedFrame, ConnectionHandler<Str
 private FrameFormat disconnectCMD (FrameFormat recievedFrame,ConnectionHandler<String> CH){
     // String topic = recievedFrame.headerName2Value("destination:");  //gets headerName,returns headerValue (null if not found) 
     // String msgBody = recievedFrame.FrameBody;
-    String recieptID = recievedFrame.headerName2Value("recieptID");
+    String recieptID = recievedFrame.headerName2Value("receipt-id");
     //check if CH has activ subscriptions, if TRUE - unsubscribe
     stompUser activeUser = ConnectionsDataStructure.users.get(CH.getActiveUser());
+    activeUser.isConnected = false;
     Collection<String> userTopics = activeUser.userSubscriptions.keySet();
     for (String topic : userTopics) {
         ConnectionsDataStructure.removeTopic_User_Topic(CH.getActiveUser(),topic);      //remove from connectionsDB, if has subscriptions - unsubscribe from all
@@ -250,9 +254,9 @@ private FrameFormat disconnectCMD (FrameFormat recievedFrame,ConnectionHandler<S
 
 
 private FrameFormat sendCMD (FrameFormat recievedFrame, ConnectionHandler<String> CH){  //returns MESSAGE frame
-    String topic = recievedFrame.headerName2Value("destination:");  //gets headerName,returns headerValue (null if not found) 
+    String topic = recievedFrame.headerName2Value("destination");  //gets headerName,returns headerValue (null if not found) 
     String msgBody = recievedFrame.FrameBody;
-    String recieptID = recievedFrame.headerName2Value("recieptID");
+    String recieptID = recievedFrame.headerName2Value("receipt-id");
     stompUser activeUser = ConnectionsDataStructure.users.get(CH.getActiveUser());
     activeUser.userReportsByGame.putIfAbsent(topic, new LinkedList<String>());
     activeUser.userReportsByGame.get(topic).add(msgBody);
@@ -299,7 +303,7 @@ private FrameFormat sendCMD (FrameFormat recievedFrame, ConnectionHandler<String
     //response if error: 
         //"not subscribed error" - sent in the beginning
 
-    return null;        //only respond if cliet wants reciept
+    return RecieptFrame(recieptID,CH);        //only respond if cliet wants reciept
 }
 
 
@@ -315,12 +319,13 @@ private FrameFormat RecieptFrame(String recieptID, ConnectionHandler<String> CH)
         // stompHeaders.add(pair);
         // recieptResponseFrame.stompHeaders=stompHeaders;
     }
-    return null;
+    //CH.send(frame2String(recieptResponseFrame));    //send reciept
+    return recieptResponseFrame;
 }
 
 private FrameFormat ErrorFrame(FrameFormat recievedFrame,String errorMsgHeader,String errorMsgBody) {
     String msgBody = recievedFrame.FrameBody;
-    String recieptID = recievedFrame.headerName2Value("recieptID");
+    String recieptID = recievedFrame.headerName2Value("receipt-id");
     String topic = recievedFrame.headerName2Value("destination");
     FrameFormat errorResponseFrame = new FrameFormat("Error",null, errorMsgBody);
     errorResponseFrame.stompHeaders = new LinkedList<>();

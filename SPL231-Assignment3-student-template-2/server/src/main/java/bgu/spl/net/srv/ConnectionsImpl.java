@@ -99,11 +99,11 @@ public boolean isLoginOk(String login, String passcode) {
         if (realPassword!=passcode) return false;   //wrong password
         return true;
     }catch (NullPointerException e){
-        System.out.println("before creation");
+       
         stompUser user = new stompUser(login, passcode);
-        System.out.println("created new user?");
+       
         users.put(login,user);       //if couldnt find this one
-        System.out.println("put in map ?");
+       
     }
     return true;
 }

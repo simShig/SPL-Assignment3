@@ -3,6 +3,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import bgu.spl.net.srv.ConnectionHandler;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -36,6 +37,15 @@ public void addSubscription (String topic,String subID){
 public String toString(){
     String ans = "n:"+userName+",p:"+passcode+",subs:"+userSubscriptions+"\n";
     return ans;
+}
+
+public String getTopicBySubId(String subID){
+    Collection<String> keys =  userSubscriptions.keySet(subID);
+    for (String topic : keys) {
+        String value = userSubscriptions.get(topic);
+        if (value.equals(subID)) return topic;
+    }
+    return null;
 }
 
 }
