@@ -1,6 +1,7 @@
 package bgu.spl.net.impl.newsfeed;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -24,5 +25,19 @@ public class NewsFeed {
 
     public void clear() {
         channels.clear();
+    }
+
+    public String toString(){
+        Collection<String> channelSet =  channels.keySet();
+        String ans = "";
+        for (String channelName : channelSet) {//FOR EACH CHANNEL
+            ConcurrentLinkedQueue<String> channalsReports = channels.get(channelName);
+            String chanString = "";
+            for (String report : channalsReports) {
+                chanString +=report+", ";
+            }
+            ans+=channelName+":\n" + chanString +"\n";
+        }
+        return ans;
     }
 }

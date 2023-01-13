@@ -19,7 +19,8 @@ static String EndOfField = ";F;";    //end of field is also the end of some line
 //methods:
 public FrameFormat (String stompCmd,LinkedList<LinkedList<String>> stompHDRS,String frameBody){
     this.stompCommand=stompCmd;
-    this.stompHeaders = stompHDRS;
+    if (stompHDRS!=null) this.stompHeaders = stompHDRS;
+    else this.stompHeaders = new LinkedList<>();
     this.FrameBody = frameBody;
 }
 
@@ -68,7 +69,8 @@ public FrameFormat (String stompCmd,LinkedList<LinkedList<String>> stompHDRS,Str
  
 public String headerName2Value (String headerName){ //gets headerName,returns headerValue (null if not found)
     for (LinkedList<String> specificHeader : stompHeaders) {
-        if (specificHeader.get(0)==headerName) return specificHeader.get(1); 
+        boolean flag = (specificHeader.get(0).equals(headerName));
+        if (flag) return specificHeader.get(1); 
     }
     return null;
 }

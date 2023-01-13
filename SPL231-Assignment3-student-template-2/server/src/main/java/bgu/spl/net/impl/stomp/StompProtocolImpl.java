@@ -41,7 +41,6 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
 
     public String process(String  msg){           //SMP interface method
         //message PARSE() method                  //TODO - method to parse the massage 
-        ConnectionsDataStructure.users.put("sdf",new stompUser("sdf", "vcbcvb"));
         print4Debug("im in StompProtocolImpl::proccess: ");
 
         ConnectionHandler<String> CH = myCH;    //the ConnectionHandler of the client from whom the massage is recieved.
@@ -58,7 +57,6 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
                  break;
             case ("CONNECT"):
                  responseFrame = connectCMD(recievedFrame,CH);
-                 ConnectionsDataStructure.users.put("testNAME", new stompUser("testNamee", "1234"));
                  print4Debug("CONNECT executed:"); 
                  break;
             case ("DISCONNECT"):
@@ -104,26 +102,27 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
 
     public FrameFormat string2Frame (String str){               //transforms msg back to frame
         String[] splitByFields = str.split(EndOfField);
-                                System.out.println("EndOfField delimiter is: "+EndOfField);//for DEBUG
+                                // System.out.println("EndOfField delimiter is: "+EndOfField);//for DEBUG
         //commandHeader:
         String sCommand = splitByFields[0];
-                                 System.out.println("sCommand is: "+sCommand);//for DEBUG
-        //stompHeaders:
+                                 System.out.println("for debug - sCommand is: "+sCommand);//for DEBUG
         LinkedList<LinkedList<String>> sHeaders = new LinkedList<>();
-        if (splitByFields.length!=3)  System.out.println("amount of fields is "+ splitByFields.length+", should be 3 (error im StompProtocolImpl::string2frame");
-        String[] headersSplitByEOL = splitByFields[1].split(EndOfLine);
-        for (int i = 1; i < headersSplitByEOL.length-1; i++) {
-          String headerName = headersSplitByEOL[i].split(":")[0];
-          String headerValue = headersSplitByEOL[i].split(":")[1];
-          LinkedList<String> Pair = new LinkedList<>();
-          Pair.add(headerName);
-          Pair.add(headerValue);
-          sHeaders.add(Pair);
-        }
         //body:
         String sBody = splitByFields[2];
-    
+        if (splitByFields.length!=3)  System.out.println("amount of fields is "+ splitByFields.length+", should be 3 (error im StompProtocolImpl::string2frame");
         FrameFormat recievedFrame = new FrameFormat(sCommand, sHeaders, sBody);
+        //stompHeaders:
+        String[] headersSplitByEOL = splitByFields[1].split(EndOfLine);
+        for (int i = 0; i < headersSplitByEOL.length; i++) {
+          String headerName = headersSplitByEOL[i].split(":")[0];
+          String headerValue = headersSplitByEOL[i].split(":")[1];
+          recievedFrame.addHeaders(headerName, headerValue);
+        //   LinkedList<String> Pair = new LinkedList<>();
+        //   Pair.add(headerName);
+        //   Pair.add(headerValue);
+        //   sHeaders.add(Pair);
+        }
+    
         return recievedFrame;
     }
 
@@ -132,7 +131,7 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
         System.out.print("no frame recieved (frame==null)");
         return null;
     }
-        String ans=null;
+        String ans="";
     //add commandHeader:
         ans=ans+frame.stompCommand + EndOfField;
     
@@ -199,9 +198,10 @@ private FrameFormat unsubscribeCMD (FrameFormat recievedFrame, ConnectionHandler
 
 
 private FrameFormat connectCMD (FrameFormat recievedFrame, ConnectionHandler<String> CH){
-    String versionID = recievedFrame.headerName2Value("version-id");
+    String versionID = recievedFrame.headerName2Value("accept-version");
     String login = recievedFrame.headerName2Value("login");
     String passcode = recievedFrame.headerName2Value("passcode");
+    if(login==null||passcode==null) return ErrorFrame(recievedFrame, "null login or passcode", "login is:"+login+"\npasscode is:"+ passcode);
     //check login?
     boolean isLoginOk = ConnectionsDataStructure.isLoginOk(login, passcode);
     if (isLoginOk){

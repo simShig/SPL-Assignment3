@@ -33,5 +33,9 @@ public void addReport (String gameName, String report){  //notice that reports a
 public void addSubscription (String topic,String subID){
     userSubscriptions.put(topic, subID);
 }
+public String toString(){
+    String ans = "n:"+userName+",p:"+passcode+",subs:"+userSubscriptions+"\n";
+    return ans;
+}
 
 }

@@ -15,9 +15,10 @@ public class InputStringGenerator {     //main that is used for creating STRINGS
         FrameFormat generatedFrame = new FrameFormat(stompCommand, stompHeaders, frameBody);
 
         //headers:
-        generatedFrame.addHeaders("headerName1","headerValue1");
-        generatedFrame.addHeaders("headerName2","headerValue2");
-        generatedFrame.addHeaders("headerName3","headerValue3");
+        generatedFrame.addHeaders("accept-version","1.2");
+        generatedFrame.addHeaders("host","stomp.cs.bgu.ac.il");
+        generatedFrame.addHeaders("login","SimonSh");
+        generatedFrame.addHeaders("passcode","1357");
         
         //turn to string:
 

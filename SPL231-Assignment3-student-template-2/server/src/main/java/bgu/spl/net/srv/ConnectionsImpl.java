@@ -1,11 +1,11 @@
 package bgu.spl.net.srv;
 
-import java.util.ArrayList;
-import java.util.Collection;
+// import java.util.ArrayList;
+// import java.util.Collection;
 import java.util.LinkedList;
-import java.util.Vector;
+// import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
+// import java.util.concurrent.ConcurrentLinkedQueue;
 
 import bgu.spl.net.impl.stomp.stompUser;
 
@@ -99,7 +99,11 @@ public boolean isLoginOk(String login, String passcode) {
         if (realPassword!=passcode) return false;   //wrong password
         return true;
     }catch (NullPointerException e){
-        users.put(login, new stompUser(login, passcode));       //if couldnt find this one
+        System.out.println("before creation");
+        stompUser user = new stompUser(login, passcode);
+        System.out.println("created new user?");
+        users.put(login,user);       //if couldnt find this one
+        System.out.println("put in map ?");
     }
     return true;
 }
