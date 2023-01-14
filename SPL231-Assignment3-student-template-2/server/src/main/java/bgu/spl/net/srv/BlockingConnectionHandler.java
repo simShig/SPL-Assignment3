@@ -35,7 +35,8 @@ public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler
     @Override
     public void run() {
         protocol.setCH(this);
-        try (Socket sock = this.sock) { //just for automatic closing
+        try  { 
+        Socket sock = this.sock;
             int read;
 
             in = new BufferedInputStream(sock.getInputStream());
@@ -74,7 +75,9 @@ public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler
     @Override
     
     public void send(T msg) {
-        try (Socket sock = this.sock) { //just for automatic closing
+        try { 
+            Socket sock = this.sock;
+            
             out = new BufferedOutputStream(sock.getOutputStream());
             // System.out.println("inside CH - finished sock.getoutput"+ out);
             String response = (String)msg;

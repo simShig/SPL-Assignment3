@@ -40,7 +40,7 @@ public class ConnectionsImpl<T> implements Connections<T>{
         //note that the msg here is already translated frame2string!!!
         //also, because subscriptionID needed, i split and merge here:
         String msg = (String)msgT;      
-        String[] splited = msg.split("FILLSUBSCRIPTIONHERE", 1);
+        String[] splited = msg.split(";subIDmissing;");
         LinkedList<stompUser> subscribedUsers = subscriptionsDB.get(channel);
         for (stompUser user : subscribedUsers) {
             String subId = user.userSubscriptions.get(channel); //get users subId to topic

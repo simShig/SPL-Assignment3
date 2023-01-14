@@ -213,6 +213,7 @@ private FrameFormat connectCMD (FrameFormat recievedFrame, ConnectionHandler<Str
         ConnectionsDataStructure.addCHtoDB(CH);
         stompUser activeUser = ConnectionsDataStructure.users.get(CH.getActiveUser());
         activeUser.isConnected = true;
+        activeUser.  currentCH=CH;
     //response if ok:
         FrameFormat ConnectedResponseFrame = new FrameFormat("CONNECTED",null,null);
         // LinkedList<LinkedList<String>> stompHeaders=new LinkedList<>();
@@ -269,7 +270,7 @@ private FrameFormat sendCMD (FrameFormat recievedFrame, ConnectionHandler<String
     FrameFormat massageFrame = new FrameFormat("MESSAGE", null, msgBody);
     
     //add headersList:
-    massageFrame.addHeaders("subscription-id", "FILLSUBSCRIPTIONHERE");//will be added inside connectionsImpl::send() because subscription id of the specific client is needed.
+    massageFrame.addHeaders("subscription-id", ";subIDmissing;");//will be added inside connectionsImpl::send() because subscription id of the specific client is needed.
     massageFrame.addHeaders("user", CH.getActiveUser());    //the user who published the massage:
     massageFrame.addHeaders("message-id", ""+ConnectionsImpl.massageID++);
     massageFrame.addHeaders("destination",topic);
