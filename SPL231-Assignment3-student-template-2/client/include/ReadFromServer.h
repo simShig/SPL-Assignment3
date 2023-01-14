@@ -1,5 +1,5 @@
-#ifndef READFROMSERVER_H
-#define READFROMSERVER_H
+#pragma once
+
 
 #include "ConnectionHandler.h"
 #include "StompProtocol.h"
@@ -14,4 +14,3 @@ public:
     void run ();
 
 };
-#endif
