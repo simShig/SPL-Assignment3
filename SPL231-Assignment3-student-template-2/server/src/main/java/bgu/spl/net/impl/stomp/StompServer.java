@@ -21,11 +21,11 @@ public class StompServer {
                 StompEncoderDecoder::new //message encoder decoder factory
         ).serve();
 
-        // Server.reactor(
-        //         Runtime.getRuntime().availableProcessors(),
-        //         7777, //port
-        //         () ->  new StompProtocolImpl(feed,connections), //protocol factory
-        //         StompEncoderDecoder::new //message encoder decoder factory
-        // ).serve();
+        Server.reactor(
+                Runtime.getRuntime().availableProcessors(),
+                7777, //port
+                () ->  new StompProtocolImpl(feed,connections), //protocol factory
+                StompEncoderDecoder::new //message encoder decoder factory
+        ).serve();
     }
 }
