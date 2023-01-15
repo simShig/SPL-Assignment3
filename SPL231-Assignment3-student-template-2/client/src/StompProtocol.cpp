@@ -25,13 +25,12 @@ void StompProtocol ::stompToString(std::string &stompFrame)
     std::stringstream ss(stompFrame);
     std::string frameHeadLine;
     std::getline(ss, frameHeadLine, ';');
+    std::cout << "headline is:"+frameHeadLine;
 
     if (frameHeadLine == "CONNECTED")
     {
-    std::cout << "inside ~if connected~: \n";
     std::cout << stompFrame;
 
-    std::cout << "\n supposed to print stompFrame^ \n";
         return;
     }
     else if (frameHeadLine == "RECEIPT")
@@ -44,11 +43,12 @@ void StompProtocol ::stompToString(std::string &stompFrame)
     }
     else if (frameHeadLine == "ERROR")
     {
+    std::cout << "inside ~if ERROR~: \n";
         std::cout << stompFrame;
     }
     else
     {
-        std::cout << "what the fuck";
+        std::cout << "what the hell???@?";
     }
 }
 
@@ -146,7 +146,7 @@ std::string StompProtocol::handleJoin(std::vector<std::string> &splitedFrame)
         id_to_game[std::to_string(game_id_counter)] = splitedFrame[1];
         game_to_id[splitedFrame[1]] = std::to_string(game_id_counter);
         receipt_id_to_message[std::to_string(recipt_id_counter)] = "Joined channel " + splitedFrame[1];
-        std::string frame = "SUBSCRIBE\nreceipt-id: " + std::to_string(recipt_id_counter) + "\ndestination: " + splitedFrame[1] + "\nID: " + std::to_string(game_id_counter) + "\n\n";
+        std::string frame = "SUBSCRIBE;F;receipt-id:" + std::to_string(recipt_id_counter) + ";L;destination:" + splitedFrame[1] + ";L;id:" + std::to_string(game_id_counter) + ";F;  ";
         recipt_id_counter += 1;
         game_id_counter += 1;
         return frame;
@@ -166,7 +166,7 @@ std::string StompProtocol::handleExit(std::vector<std::string> &splitedFrame)
         id_to_game.erase(game_id);
         game_to_id.erase(splitedFrame[1]);
         receipt_id_to_message[std::to_string(recipt_id_counter)] = "Exited channel " + splitedFrame[1];
-        std::string frame = "UNSUBSCRIBE\nreceipt-id: " + std::to_string(recipt_id_counter) + "\ndestination: " + splitedFrame[1] + "\nID: " + game_id + "\n\n";
+        std::string frame = "UNSUBSCRIBE;F;receipt-id:" + std::to_string(recipt_id_counter) + ";L;destination:" + splitedFrame[1] + ";L;ID:" + game_id + ";F;   ";
         recipt_id_counter += 1;
         return frame;
     }
@@ -176,10 +176,12 @@ std::string StompProtocol::handleReport(std::vector<std::string> &splitedFrame)
 {
     return "";
 }
+
+
 std::string StompProtocol::handleLogout(std::vector<std::string> &splitedFrame)
 {
     receipt_id_to_message[std::to_string(recipt_id_counter)] = "disconnect";
-    std::string frame = "DISCONNECT\nreceipt: " + std::to_string(recipt_id_counter) + "\n\n";
+    std::string frame = "DISCONNECT;F;receipt:" + std::to_string(recipt_id_counter) +";F;  ";
     recipt_id_counter += 1;
     return frame;
 }
