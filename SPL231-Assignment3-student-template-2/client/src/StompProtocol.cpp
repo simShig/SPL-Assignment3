@@ -21,13 +21,17 @@ bool StompProtocol::shouldTerminate()
 
 void StompProtocol ::stompToString(std::string &stompFrame)
 {
+    // std::cout << "inside StompProtocol::stompToString";
     std::stringstream ss(stompFrame);
     std::string frameHeadLine;
-    std::getline(ss, frameHeadLine, '\n');
+    std::getline(ss, frameHeadLine, ';');
+
     if (frameHeadLine == "CONNECTED")
     {
-    std::cout << "helloWorld";
+    std::cout << "inside ~if connected~: \n";
     std::cout << stompFrame;
+
+    std::cout << "\n supposed to print stompFrame^ \n";
         return;
     }
     else if (frameHeadLine == "RECEIPT")

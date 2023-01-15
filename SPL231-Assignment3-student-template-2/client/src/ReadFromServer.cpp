@@ -10,7 +10,7 @@ ReadFromServer:: ReadFromServer(ConnectionHandler &_connectionHandler, StompProt
 
 void ReadFromServer::run()
 {
-    while (MyProtocol.shouldTerminate())
+    while (!MyProtocol.shouldTerminate())
     {
         std::string answer;
         // Get back an answer: by using the expected number of bytes (len bytes + newline delimiter)
@@ -21,11 +21,13 @@ void ReadFromServer::run()
                       << std::endl;
             break;
         }
+// std::cout<<"answer is:" + answer << std::endl;
         int len = answer.length();
         // A C string must end with a 0 char delimiter.  When we filled the answer buffer from the socket
         // we filled up to the \n char - we must make sure now that a 0 char is also present. So we truncate last character.
         answer.resize(len - 1);
         MyProtocol.stompToString(answer);
+        // std::cout<<"after stomp2string calling:" + answer << std::endl;
     }
 }
 #endif
