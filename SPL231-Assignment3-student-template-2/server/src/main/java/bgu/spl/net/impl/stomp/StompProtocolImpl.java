@@ -42,7 +42,7 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
     public String process(String  msg){           //SMP interface method
         //message PARSE() method                  //TODO - method to parse the massage 
         print4Debug("im in StompProtocolImpl::proccess: ");
-
+        System.out.print("msg is:\n"+msg+"\n");
         ConnectionHandler<String> CH = myCH;    //the ConnectionHandler of the client from whom the massage is recieved.
         FrameFormat recievedFrame =string2Frame(msg);
         FrameFormat responseFrame = null;
@@ -101,6 +101,7 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
  */
 
     public FrameFormat string2Frame (String str){               //transforms msg back to frame
+        System.out.println("S2f str is: \n"+str+"\n");//for DEBUG
         String[] splitByFields = str.split(EndOfField);
                                 // System.out.println("EndOfField delimiter is: "+EndOfField);//for DEBUG
         //commandHeader:

@@ -1,4 +1,6 @@
-#pragma once
+
+#ifndef STOMPPROTOCOL_CPP
+#define STOMPPROTOCOL_CPP
 
 #include "../include/StompProtocol.h"
 #include "../include/FrameFormat.h"
@@ -24,6 +26,8 @@ void StompProtocol ::stompToString(std::string &stompFrame)
     std::getline(ss, frameHeadLine, '\n');
     if (frameHeadLine == "CONNECTED")
     {
+    std::cout << "helloWorld";
+    std::cout << stompFrame;
         return;
     }
     else if (frameHeadLine == "RECEIPT")
@@ -120,7 +124,7 @@ std::string StompProtocol::handleLogin(std::vector<std::string> &splitedFrame)
     else
     {
         receipt_id_to_message[std::to_string(recipt_id_counter)] = "Login successful";
-        std::string frame = "CONNECT\nreceipt-id: " + std::to_string(recipt_id_counter) + "\n" + "accept-version: 1.2\nhost: " + splitedFrame[1] + "\nlogin: " + splitedFrame[2] + "\npasscode: " + splitedFrame[3] + "\n\n";
+        std::string frame = "CONNECT;F;receipt-id:" + std::to_string(recipt_id_counter) + ";L;" + "accept-version:1.2;L;host:" + splitedFrame[1] + ";L;login:" + splitedFrame[2] + ";L;passcode:" + splitedFrame[3] + ";F;\nemptyBody";
         recipt_id_counter += 1;
         return frame;
     }
@@ -192,4 +196,4 @@ std::string StompProtocol::handleLogout(std::vector<std::string> &splitedFrame)
 // }
 
 
-
+#endif

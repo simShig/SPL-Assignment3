@@ -1,4 +1,5 @@
-#pragma once
+#ifndef STOMPCLIENT_CPP
+#define STOMPCLIENT_CPP
 
 #include "../include/StompProtocol.h"
 #include "../include/ConnectionHandler.h"
@@ -60,3 +61,5 @@ int main(int argc, char *argv[])
 
 th1.join();
 }
+
+#endif
