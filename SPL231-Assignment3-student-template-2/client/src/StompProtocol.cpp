@@ -25,11 +25,11 @@ void StompProtocol ::stompToString(std::string &stompFrame)
     std::stringstream ss(stompFrame);
     std::string frameHeadLine;
     std::getline(ss, frameHeadLine, ';');
-    std::cout << "headline is:"+frameHeadLine;
+    //std::cout << "====headline is:===="+frameHeadLine + "===stompFrame is: ===" +stompFrame + "***************\n";
 
     if (frameHeadLine == "CONNECTED")
     {
-    std::cout << stompFrame;
+    //std::cout << ">>>>>>>>>>>>>>>>"+stompFrame;
 
         return;
     }
@@ -48,13 +48,14 @@ void StompProtocol ::stompToString(std::string &stompFrame)
     }
     else
     {
-        std::cout << "what the hell???@?";
+        return;
+        //std::cout << "what the hell???@?";
     }
 }
 
 void StompProtocol ::handleReceipt(std::string &stompFrame)
 {
-    std::vector<std::string> splitedFrame = splitString(stompFrame, ' ');
+    std::vector<std::string> splitedFrame = splitString(stompFrame, ';');
     std::string receiptID = splitedFrame[1];
     std::string content = receipt_id_to_message[receiptID];
     if (content == "disconnect")
@@ -93,6 +94,8 @@ std::string StompProtocol::stringToStomp(std::string &dataFromUser)
     std::string action = splitedFrame[0];
     if (action == "login")
     {
+        // std::cout << "im in login if, ---" + splitedFrame[0] + "--- is splitedFrame0, 1---" + splitedFrame[1] 
+        // + "--- 2---" + splitedFrame[2]+ "--- 3---" + splitedFrame[3]<< std::endl;
         return handleLogin(splitedFrame);
     }
     else if (action == "join")
@@ -120,16 +123,21 @@ std::string StompProtocol::stringToStomp(std::string &dataFromUser)
 
 std::string StompProtocol::handleLogin(std::vector<std::string> &splitedFrame)
 {
+    //std::cout << "im in handleLogin: \n" << std::endl;
     if (splitedFrame.size() != 4)
     {
+        //std::cout << "im in if (splitedFrame.size() != 4): \n" << std::endl;
         std::cout << "illigal command, login dont have 4 words" << std::endl;
         return "%";
     }
     else
     {
+        //std::cout << "im in if ELSE HANDLELOGIN: \n" << std::endl;
         receipt_id_to_message[std::to_string(recipt_id_counter)] = "Login successful";
-        std::string frame = "CONNECT;F;receipt-id:" + std::to_string(recipt_id_counter) + ";L;" + "accept-version:1.2;L;host:" + splitedFrame[1] + ";L;login:" + splitedFrame[2] + ";L;passcode:" + splitedFrame[3] + ";F;\nemptyBody";
+        std::string frame = "CONNECT;F;receipt-id:" + std::to_string(recipt_id_counter) + ";L;" + "accept-version:1.2;L;host:" + splitedFrame[1] + ";L;login:" + splitedFrame[2] + ";L;passcode:" + splitedFrame[3] + ";F; emptybodie";
         recipt_id_counter += 1;
+        //std::cout << frame << std::endl;
+        std::cout << "Login successful" << std::endl;
         return frame;
     }
 }
@@ -149,6 +157,7 @@ std::string StompProtocol::handleJoin(std::vector<std::string> &splitedFrame)
         std::string frame = "SUBSCRIBE;F;receipt-id:" + std::to_string(recipt_id_counter) + ";L;destination:" + splitedFrame[1] + ";L;id:" + std::to_string(game_id_counter) + ";F;  ";
         recipt_id_counter += 1;
         game_id_counter += 1;
+        std::cout << "Joined channel " + splitedFrame[1] << std::endl;
         return frame;
     }
 }
@@ -168,6 +177,7 @@ std::string StompProtocol::handleExit(std::vector<std::string> &splitedFrame)
         receipt_id_to_message[std::to_string(recipt_id_counter)] = "Exited channel " + splitedFrame[1];
         std::string frame = "UNSUBSCRIBE;F;receipt-id:" + std::to_string(recipt_id_counter) + ";L;destination:" + splitedFrame[1] + ";L;ID:" + game_id + ";F;   ";
         recipt_id_counter += 1;
+        std::cout << "Exited channel " + splitedFrame[1] << std::endl;
         return frame;
     }
 }
