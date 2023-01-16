@@ -187,6 +187,7 @@ private FrameFormat unsubscribeCMD (FrameFormat recievedFrame, ConnectionHandler
     stompUser activeUser = ConnectionsDataStructure.users.get(CH.getActiveUser());
     String subscriptionID = recievedFrame.headerName2Value("id");
     String topic = activeUser.getTopicBySubId(subscriptionID);  //use user method to get topic by subID
+    if (!activeUser.userSubscriptions.keySet().contains(topic)) return ErrorFrame(recievedFrame,"Error:failed unsubscribing", "tryed to unsubscribe of a topic you never subscribed to!");
     // String msgBody = recievedFrame.FrameBody;
     String recieptID = recievedFrame.headerName2Value("receipt-id");
     if (subscriptionID==null) return ErrorFrame(recievedFrame,"no relevant subscription ID","Error Massage Body!!!");
@@ -213,6 +214,10 @@ private FrameFormat connectCMD (FrameFormat recievedFrame, ConnectionHandler<Str
         //add CH to connections
         ConnectionsDataStructure.addCHtoDB(CH);
         stompUser activeUser = ConnectionsDataStructure.users.get(CH.getActiveUser());
+        if (activeUser.isConnected){        //if already connected
+            disconnectCMD(recievedFrame, CH);
+            return ErrorFrame(recievedFrame, "Error: double connection attempt" , "you are being disconnected because you tryed to connect twice!");
+        }
         activeUser.isConnected = true;
         activeUser.  currentCH=CH;
     //response if ok:
