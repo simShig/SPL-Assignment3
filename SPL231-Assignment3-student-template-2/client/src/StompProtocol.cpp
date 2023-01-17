@@ -6,10 +6,13 @@
 #include "../include/FrameFormat.h"
 #include "../include/ConnectionHandler.h"
 #include "../include/StompClient.h"
+#include "../include/event.h"
 #include <thread>
 #include <stdlib.h>
 #include <sstream>
 #include <iostream>
+#include <string>
+#include <vector>
 
 // TODO: implement the STOMP protocol
 StompProtocol ::StompProtocol() : recipt_id_counter(1), game_id_counter(1), should_terminate(false), id_to_game(), game_to_id(), receipt_id_to_message() {}
@@ -184,7 +187,7 @@ std::string StompProtocol::handleExit(std::vector<std::string> &splitedFrame)
 
 std::string StompProtocol::handleReport(std::vector<std::string> &splitedFrame)
 {
-    return "";
+    return sendFrame();
 }
 
 
@@ -194,6 +197,39 @@ std::string StompProtocol::handleLogout(std::vector<std::string> &splitedFrame)
     std::string frame = "DISCONNECT;F;receipt:" + std::to_string(recipt_id_counter) +";F;  ";
     recipt_id_counter += 1;
     return frame;
+}
+//=================================================================
+std::vector<std::string> StompProtocol::sendFrame(std::vector<std::string> &splitedInput)
+{
+names_and_events fileContent = parseEventsFile(splitedInput[1]);
+string topic = fileContent.team_a_name + string("_") + fileContent.team_b_name;
+std::vector<std::string> eventframes;
+for (size_t i = 0; i < fileContent.events.size(); i++)
+{
+eventframes.push_back(createEventFrame(fileContent.events[i], topic));
+}
+return eventframes;
+}
+
+std::string StompProtocol::createEventFrame(Event &event, string topic)
+{
+string generalUpdates = "";
+string teamAUpdates = "";
+string teamBUpdates = "";
+
+for (auto key : event.get_game_updates())
+generalUpdates += key.first + string(": ") + key.second + ";L;";
+for (auto key : event.get_team_a_updates())
+teamAUpdates += key.first + string(": ") + key.second + ";L;";
+for (auto key : event.get_team_b_updates())
+teamBUpdates += key.first + string(": ") + key.second + ";L;";
+string frame = "SEND;L;" + string("destination:/topic/") + topic + ";L;" + "receipt-id:" + std::to_string(recipt_id_counter) + ";L;" + ";L;" +
+  string("user: ") +  event.get_name() + ";L;" + string("team a: ") + event.get_team_a_name() + ";L;" + string("team b: ") +
+  event.get_team_b_name() + ";L;" + string("event name: ") + event.get_name() +
+  ";L;" + string("time: ") + std::to_string(event.get_time()) + ";L;" + string("general game updates: ") +
+  generalUpdates + ";L;" + string("team a updates: ") + teamAUpdates + ";L;" + string("team b updates: ") +
+  teamBUpdates + ";L;" + string("description: ") + event.get_discription() + ";L;;F;";
+return frame;
 }
 
 // string StompProtocol::process(string message)

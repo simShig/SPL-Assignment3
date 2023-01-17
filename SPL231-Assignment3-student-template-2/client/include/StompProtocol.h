@@ -3,6 +3,8 @@
 #include "../include/FrameFormat.h"
 #include <unordered_map>
 #include <string>
+#include <vector>
+
 
 // TODO: implement the STOMP protocol
 class StompProtocol
@@ -22,6 +24,9 @@ private:
     std::string handleReport(std::vector<std::string> &splitedFrame);
     std::string handleLogout(std::vector<std::string> &splitedFrame);
     std::vector<std::string> splitString(const std::string &str, char x);
+    std::vector<std::string> sendFrame(std::vector<std::string> &splitedInput);
+    std::string StompProtocol::createEventFrame(Event &event, string topic);
+
 
 public:
     string process(string message);
