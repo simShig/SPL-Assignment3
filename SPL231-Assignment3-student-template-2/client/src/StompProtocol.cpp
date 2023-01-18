@@ -5,8 +5,8 @@
 #include "../include/FrameFormat.h"
 #include "../include/ConnectionHandler.h"
 #include "../include/StompClient.h"
-#include "../include/event.h"
-#include "../include/summary.h"
+#include "../include/Event.h"
+#include "../include/Summary.h"
 #include <thread>
 #include <stdlib.h>
 #include <sstream>
