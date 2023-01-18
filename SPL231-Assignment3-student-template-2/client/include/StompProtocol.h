@@ -1,8 +1,8 @@
 #pragma once
 #include "../include/ConnectionHandler.h"
 #include "../include/FrameFormat.h"
-#include "event.h"
-#include "summary.h"
+#include "../include/event.h"
+#include "../include/summary.h"
 #include <unordered_map>
 #include <string>
 #include <vector>
@@ -31,7 +31,7 @@ private:
     std::string handleLogout(std::vector<std::string> &splitedFrame);
     std::vector<std::string> splitString(const std::string &str, char x);
     std::vector<std::string> sendFrame(std::vector<std::string> &splitedInput);
-    std::string StompProtocol::createEventFrame(Event &event, string topic); /////////////////////
+    std::string createEventFrame(Event &event, string topic); /////////////////////
 
     int subCounter;
     int recieptCounter;
@@ -77,7 +77,7 @@ public:
     string get_user_name(std::deque<std::string> &s);
     void addingEvent(Event &e, string userid);
     void logout();
-    std::string StompProtocol::ans2Frame(std::vector<std::string> ans);
+    std::string ans2Frame(std::vector<std::string> ans);
 
 };
 

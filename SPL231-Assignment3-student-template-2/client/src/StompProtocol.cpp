@@ -209,20 +209,6 @@ std::string StompProtocol::ans2Frame(std::vector<std::string> ans)
  
 }
 
-void StompProtocol::addEvents(names_and_events parsed)
-{
- for (Event e : parsed.events)
- {
- string gameName = e.get_team_a_name() + "_" + e.get_team_b_name();
- checksBeforeAddEvent(userName, gameName);
- if (subScribed.count(gameName) == 0)
- {
- should_terminate=true;
- break;
- }
- (summaries[gameName])[userName].addEvent(e); // add event to the summary of the user
- }
-}
 
 std::string StompProtocol::handleLogout(std::vector<std::string> &splitedFrame)
 {
