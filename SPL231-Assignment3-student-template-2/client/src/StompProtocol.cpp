@@ -113,7 +113,8 @@ std::string StompProtocol::stringToStomp(std::string &dataFromUser)
  }
  else if (action == "report")
  {
- return handleReport(splitedFrame, dataFromUser);
+    return sendFrame(splitedFrame);
+ //return handleReport(splitedFrame, dataFromUser);
  }
  else if (action == "logout")
  {
@@ -189,15 +190,24 @@ std::string StompProtocol::handleExit(std::vector<std::string> &splitedFrame)
 
 std::string StompProtocol::handleReport(std::vector<std::string> &splitedFrame, std::string &dataFromUser)
 {
- string file;
- std::stringstream input_stringstream(dataFromUser);
- getline(input_stringstream, file, ' ');
- file = "./data/" + file;
- names_and_events parsed = parseEventsFile(file);
- addEvents(parsed);
- std::vector<std::string> ans;
+string file;
+std::cout << "line 193\n" << std::endl;
+std::stringstream input_stringstream(dataFromUser);
+std::cout << "line 195\n" << std::endl;
+getline(input_stringstream, file, ' ');
+std::cout << "line 197\n" << std::endl;
+file = "./data/" + file;
+std::cout << "line 199\n ===============" + file << std::endl;
+names_and_events parsed = parseEventsFile("/home/spl211/Desktop/SPL-Assignment3-2/SPL231-Assignment3-student-template-2/client/data/events1_partial.json");
+std::cout << "line 201\n" << std::endl;
+addEvents(parsed);
+std::cout << "line 203\n" << std::endl;
+std::vector<std::string> ans;
+std::cout << "line 205\n" << std::endl;
  ans = createVector(parsed);
+std::cout << "line 207\n" << std::endl;
  string frame = ans2Frame(ans);
+std::cout << "line 209\n" << std::endl;
  return frame; //TODO
 }
 std::string StompProtocol::ans2Frame(std::vector<std::string> ans)
@@ -211,7 +221,6 @@ std::string StompProtocol::ans2Frame(std::vector<std::string> ans)
  
 }
 
-
 std::string StompProtocol::handleLogout(std::vector<std::string> &splitedFrame)
 {
  receipt_id_to_message[std::to_string(recipt_id_counter)] = "disconnect";
@@ -220,16 +229,30 @@ std::string StompProtocol::handleLogout(std::vector<std::string> &splitedFrame)
  return frame;
 }
 //=================================================================
-std::vector<std::string> StompProtocol::sendFrame(std::vector<std::string> &splitedInput)
+std::string StompProtocol::sendFrame(std::vector<std::string> &splitedInput)
 {
+    std::cout << splitedInput[1] +"\n" << std::endl;
 names_and_events fileContent = parseEventsFile(splitedInput[1]);
+    std::cout << "line236\n" << std::endl;
 string topic = fileContent.team_a_name + string("_") + fileContent.team_b_name;
+    std::cout << "line238, the topic is: \n" +topic << std::endl;
 std::vector<std::string> eventframes;
 for (size_t i = 0; i < fileContent.events.size(); i++)
 {
 eventframes.push_back(createEventFrame(fileContent.events[i], topic));
 }
-return eventframes;
+return sendFramestring(eventframes);
+}
+
+std::string StompProtocol::sendFramestring(std::vector<std::string> &eventframes)
+{
+    string str ="";
+    for (const std::string& s : eventframes) {
+        str += s;
+    }
+    std::cout << "im in line 253, str is: \n" +str << std::endl;
+
+    return str;
 }
 
 std::string StompProtocol::createEventFrame(Event &event, string topic)
