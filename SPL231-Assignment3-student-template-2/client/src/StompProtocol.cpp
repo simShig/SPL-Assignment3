@@ -15,6 +15,7 @@
 #include <vector>
 #include <map>
 
+
 // TODO: implement the STOMP protocol
 StompProtocol ::StompProtocol() : recipt_id_counter(1), game_id_counter(1), should_terminate(false), id_to_game(), game_to_id(), receipt_id_to_message(), subCounter(0), recieptCounter(0),userName(""), subScribed(),summaries(),recieptMap() {}
 
@@ -237,7 +238,7 @@ string generalUpdates = "";
 string teamAUpdates = "";
 string teamBUpdates = "";
 
-for (auto key : event.get_game_updates())
+for (auto key : event.Event::get_game_updates())
 generalUpdates += key.first + string(": ") + key.second + ";L;";
 for (auto key : event.get_team_a_updates())
 teamAUpdates += key.first + string(": ") + key.second + ";L;";
