@@ -6,6 +6,7 @@
 #include "../include/ConnectionHandler.h"
 #include "../include/StompClient.h"
 #include "../include/event.h"
+#include "../include/summary.h"
 #include <thread>
 #include <stdlib.h>
 #include <sstream>
@@ -15,7 +16,7 @@
 #include <map>
 
 // TODO: implement the STOMP protocol
-StompProtocol ::StompProtocol() : recipt_id_counter(1), game_id_counter(1), should_terminate(false), id_to_game(), game_to_id(), receipt_id_to_message() {}
+StompProtocol ::StompProtocol() : recipt_id_counter(1), game_id_counter(1), should_terminate(false), id_to_game(), game_to_id(), receipt_id_to_message(), subCounter(0), recieptCounter(0),userName(""), subScribed(),summaries(),recieptMap() {}
 
 bool StompProtocol::shouldTerminate()
 {
@@ -204,8 +205,8 @@ std::string StompProtocol::ans2Frame(std::vector<std::string> ans)
  for (const std::string& str : ans) {
  frame.append(str + ";L;");
  }
- std::cout << frame << std::endl;
- return frame;
+ std::cout << frame+";F;  " << std::endl;
+ return (frame+";F;  ");
  
 }
 

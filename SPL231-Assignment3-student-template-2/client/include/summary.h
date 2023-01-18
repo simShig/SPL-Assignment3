@@ -16,15 +16,15 @@ private:
 
 public:
     Summary();
+    void addEvent(Event event);
     void addEvent(string,string gameName);
-    string toString(string file);
     void addGeneralStats(std::map<string,string>);
     void addTeamStats(std::map<string,string> map,string team);
+    void addreports(string discription,string time);
+    string toString(string file);
     string toStringHashMap(std::map<string,string> h);
     string toStringReports(std::map<string,string> h);
 
-    void addreports(string discription,string time);
-    void addEvent(Event event);
 };
 
 
