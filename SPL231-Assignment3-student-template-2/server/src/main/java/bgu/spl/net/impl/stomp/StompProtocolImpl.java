@@ -42,7 +42,7 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
     public String process(String  msg){           //SMP interface method
         //message PARSE() method                  //TODO - method to parse the massage 
         print4Debug("im in StompProtocolImpl::proccess: ");
-        System.out.print("msg is:\n"+msg+"\n");
+       // System.out.print("msg is:\n"+msg+"\n");
         ConnectionHandler<String> CH = myCH;    //the ConnectionHandler of the client from whom the massage is recieved.
         FrameFormat recievedFrame =string2Frame(msg);
         FrameFormat responseFrame = null;

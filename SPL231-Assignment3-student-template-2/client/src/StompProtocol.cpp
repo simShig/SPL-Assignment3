@@ -180,7 +180,7 @@ std::string StompProtocol::handleExit(std::vector<std::string> &splitedFrame)
  id_to_game.erase(game_id);
  game_to_id.erase(splitedFrame[1]);
  receipt_id_to_message[std::to_string(recipt_id_counter)] = "Exited channel " + splitedFrame[1];
- std::string frame = "UNSUBSCRIBE;F;receipt-id:" + std::to_string(recipt_id_counter) + ";L;destination:" + splitedFrame[1] + ";L;ID:" + game_id + ";F; ";
+ std::string frame = "UNSUBSCRIBE;F;receipt-id:" + std::to_string(recipt_id_counter) + ";L;destination:" + splitedFrame[1] + ";L;id:" + game_id + ";F; ";
  recipt_id_counter += 1;
  std::cout << "Exited channel " + splitedFrame[1] << std::endl;
  return frame;
