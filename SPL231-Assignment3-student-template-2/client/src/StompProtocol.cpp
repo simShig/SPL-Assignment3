@@ -231,11 +231,11 @@ std::string StompProtocol::handleLogout(std::vector<std::string> &splitedFrame)
 //=================================================================
 std::string StompProtocol::sendFrame(std::vector<std::string> &splitedInput)
 {
-    std::cout << splitedInput[1] +"\n" << std::endl;
+   // std::cout << splitedInput[1] +"\n" << std::endl;
 names_and_events fileContent = parseEventsFile(splitedInput[1]);
-    std::cout << "line236\n" << std::endl;
+   // std::cout << "line236\n" << std::endl;
 string topic = fileContent.team_a_name + string("_") + fileContent.team_b_name;
-    std::cout << "line238, the topic is: \n" +topic << std::endl;
+  //  std::cout << "line238, the topic is: \n" +topic << std::endl;
 std::vector<std::string> eventframes;
 for (size_t i = 0; i < fileContent.events.size(); i++)
 {
@@ -250,7 +250,7 @@ std::string StompProtocol::sendFramestring(std::vector<std::string> &eventframes
     for (const std::string& s : eventframes) {
         str += s;
     }
-    std::cout << "im in line 253, str is: \n" +str << std::endl;
+    //std::cout << "im in line 253, str is: \n" +str << std::endl;
 
     return str;
 }
@@ -262,12 +262,12 @@ string teamAUpdates = "";
 string teamBUpdates = "";
 
 for (auto key : event.get_game_updates())
-generalUpdates += key.first + string(": ") + key.second + ";L;";
+generalUpdates += key.first + string(":=========== ") + key.second + ";L;";
 for (auto key : event.get_team_a_updates())
-teamAUpdates += key.first + string(": ") + key.second + ";L;";
+teamAUpdates += key.first + string(":------------- ") + key.second + ";L;";
 for (auto key : event.get_team_b_updates())
-teamBUpdates += key.first + string(": ") + key.second + ";L;";
-string frame = "SEND;L;" + string("destination:/topic/") + topic + ";L;" + "receipt-id:" + std::to_string(recipt_id_counter) + ";L;" + ";L;" +
+teamBUpdates += key.first + string(":+++++++++++++++ ") + key.second + ";L;";
+string frame = "SEND;F;;L;" + string("destination:/topic/") + topic + ";L;" + "receipt-id:" + std::to_string(recipt_id_counter) + ";L;" + ";F;" +
  string("user: ") + event.get_name() + ";L;" + string("team a: ") + event.get_team_a_name() + ";L;" + string("team b: ") +
  event.get_team_b_name() + ";L;" + string("event name: ") + event.get_name() +
  ";L;" + string("time: ") + std::to_string(event.get_time()) + ";L;" + string("general game updates: ") +

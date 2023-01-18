@@ -30,8 +30,10 @@ private:
     std::string handleReport(std::vector<std::string> &splitedFrame, std::string &dataFromUser);
     std::string handleLogout(std::vector<std::string> &splitedFrame);
     std::vector<std::string> splitString(const std::string &str, char x);
-    std::vector<std::string> sendFrame(std::vector<std::string> &splitedInput);
-    std::string createEventFrame(Event &event, string topic); /////////////////////
+    std::string sendFrame(std::vector<std::string> &splitedInput);
+    std::string createEventFrame(Event &event, string topic);
+    std::string sendFramestring(std::vector<std::string> &eventframes);
+ /////////////////////
 
     int subCounter;
     int recieptCounter;
