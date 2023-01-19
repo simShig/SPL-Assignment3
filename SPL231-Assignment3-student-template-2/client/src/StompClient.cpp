@@ -4,7 +4,6 @@
 #include "../include/StompProtocol.h"
 #include "../include/ConnectionHandler.h"
 #include "../include/StompClient.h"
-#include "../include/FrameFormat.h"
 #include "../include/ReadFromServer.h"
 #include <thread>
 #include <stdlib.h>

@@ -2,11 +2,10 @@
 #define STOMPPROTOCOL_CPP
 
 #include "../include/StompProtocol.h"
-#include "../include/FrameFormat.h"
 #include "../include/ConnectionHandler.h"
 #include "../include/StompClient.h"
 #include "../include/Event.h"
-#include "../include/Summary.h"
+#include "../include/Game.h"
 #include <thread>
 #include <stdlib.h>
 #include <sstream>
@@ -48,8 +47,8 @@ void StompProtocol ::stompToString(std::string &stompFrame)
  }
  else if (frameHeadLine == "ERROR")
  {
- std::cout << "inside ~if ERROR~: \n";
- std::cout << stompFrame;
+ //std::cout << "inside ~if ERROR~: \n";
+ //std::cout << stompFrame;
  }
  else
  {
@@ -335,12 +334,12 @@ bool StompProtocol::summariesNotContainGame(string gameName)
 }
 void StompProtocol::addGameToSummaries(string gameName)
 {
- std::map<std::string, Summary> map; // create new map for the game
+ std::map<std::string, Game> map; // create new map for the game
  summaries[gameName] = map; // add to summaries the map
 }
 void StompProtocol::addUserNameToGameSummary(string userName, string gameName)
 {
- Summary s; // create summay for the user that reported
+ Game s; // create summay for the user that reported
  (summaries[gameName])[userName] = s; // add the summary to the user in the map
 }
 vector<string> StompProtocol::createVector(names_and_events parsed)

@@ -1,3 +1,6 @@
+#ifndef ECHOCLIENT_CPP
+#define ECHOCLIENT_CPP
+
 #include <stdlib.h>
 #include "../include/ConnectionHandler.h"
 
@@ -63,3 +66,4 @@ int main (int argc, char *argv[]) {
     }
     return 0;
 }
+#endif

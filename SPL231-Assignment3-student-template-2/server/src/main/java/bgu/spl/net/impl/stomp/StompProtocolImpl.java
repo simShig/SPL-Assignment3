@@ -79,14 +79,11 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
 
     private void print4Debug(String header) {   //prints information regarding DBs for debbuging
     //header:
-    System.out.println("~~~~~~~~~~~~~~~~~~~~~\n"+header+"~~~~~~~~~~~~~~~~~~~~~\n");
-    System.out.println("connectionsDB:\n    "+ConnectionsDataStructure.connectionsDB);
-    System.out.println("subscriptionsDB:\n    "+ConnectionsDataStructure.subscriptionsDB);
-    System.out.println("users:\n    "+ConnectionsDataStructure.users);
-    System.out.println("reports:\n    "+NewsDataStructure+"\n");
-
-
-
+    // System.out.println("~~~~~~~~~~~~~~~~~~~~~\n"+header+"~~~~~~~~~~~~~~~~~~~~~\n");
+    // System.out.println("connectionsDB:\n    "+ConnectionsDataStructure.connectionsDB);
+    // System.out.println("subscriptionsDB:\n    "+ConnectionsDataStructure.subscriptionsDB);
+    // System.out.println("users:\n    "+ConnectionsDataStructure.users);
+    // System.out.println("reports:\n    "+NewsDataStructure+"\n");
 
     }
 
@@ -101,12 +98,12 @@ public class StompProtocolImpl implements StompMessagingProtocol<String> {
  */
 
     public FrameFormat string2Frame (String str){               //transforms msg back to frame
-        System.out.println("S2f str is: \n"+str+"\n");//for DEBUG
+        //System.out.println("S2f str is: \n"+str+"\n");//for DEBUG
         String[] splitByFields = str.split(EndOfField);
                                 // System.out.println("EndOfField delimiter is: "+EndOfField);//for DEBUG
         //commandHeader:
         String sCommand = splitByFields[0];
-                                 System.out.println("for debug - sCommand is: "+sCommand);//for DEBUG
+                                 //System.out.println("for debug - sCommand is: "+sCommand);//for DEBUG
         LinkedList<LinkedList<String>> sHeaders = new LinkedList<>();
         //body:
         String sBody = splitByFields[2];

@@ -1,8 +1,7 @@
 #pragma once
 #include "../include/ConnectionHandler.h"
-#include "../include/FrameFormat.h"
 #include "../include/Event.h"
-#include "../include/Summary.h"
+#include "../include/Game.h"
 #include <unordered_map>
 #include <string>
 #include <vector>
@@ -10,7 +9,7 @@
 #include <deque>
 using std::string;
 using namespace std;
-class Summary;
+class Game;
 
 // TODO: implement the STOMP protocol
 class StompProtocol
@@ -39,13 +38,11 @@ private:
     int recieptCounter;
     std::string userName;
     std::map<string, string> subScribed; // topic - id
-    std::map<string, std::map<string, Summary>> summaries;
+    std::map<string, std::map<string, Game>> summaries;
     std::map<string, string> recieptMap; // reciept - action
 
 public:
     string process(string message);
-    FrameFormat string2Frame(string line);
-    string Frame2String(FrameFormat frame);
     StompProtocol();
     bool shouldTerminate();
     void stompToString(std::string &stompFrame);

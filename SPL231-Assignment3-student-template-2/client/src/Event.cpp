@@ -1,3 +1,6 @@
+#ifndef EVENT_CPP
+#define EVENT_CPP
+
 #include "../include/Event.h"
 #include "../include/json.hpp"
 #include <iostream>
@@ -114,3 +117,4 @@ names_and_events parseEventsFile(std::string json_path)
 
     return events_and_names;
 }
+#endif
