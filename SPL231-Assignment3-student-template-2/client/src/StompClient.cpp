@@ -60,18 +60,19 @@ int main(int argc, char *argv[])
                 framesarchive.push_back(largeString);
                 break;
             }
-            std::cout << "in while(true)" << std::endl;
+            //std::cout << "in while(true)" << std::endl;
             size_t sendPos = largeString.find("SEND", start);
             if (sendPos == std::string::npos) {
-                std::cout << "in if npos :" + largeString << std::endl;
+                //std::cout << "in if npos :" + largeString << std::endl;
                 break;
             }
+          
             size_t end = largeString.find('\0', sendPos);
             if (end != std::string::npos) {
                 framesarchive.push_back(largeString.substr(sendPos, end - sendPos));
-                std::cout << "in else :" + framesarchive.front() << std::endl;
+                //std::cout << "in else :" + framesarchive.front() << std::endl;
                 start = end + 1;
-                std::cout << "start = "+start << std::endl;
+                //std::cout << "start = "+start << std::endl;
             }
         }
         //SUBSCRIBEcvxcvxcvxcv

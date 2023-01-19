@@ -62,7 +62,7 @@ void StompProtocol ::handleReceipt(std::string &stompFrame)
  std::vector<std::string> splitedFrame = splitString(stompFrame, ';');
  std::string receiptID = splitedFrame[1];
  std::string content = receipt_id_to_message[receiptID];
- if (content == "disconnect")
+ if (content == "DISCONNECT")
  {
  std ::cout << "Bye Bye <3" << std::endl;
  should_terminate = true;
