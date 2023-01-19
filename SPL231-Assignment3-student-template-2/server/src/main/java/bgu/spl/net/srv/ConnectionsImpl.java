@@ -48,6 +48,7 @@ public class ConnectionsImpl<T> implements Connections<T>{
             msg = splited[0]+subId+splited[1];      //chain it all to a new String
             user.currentCH.send(msg);
         }
+        //jjj
     };
     
     public void disconnect(int connectionId){
