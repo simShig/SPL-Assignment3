@@ -239,18 +239,19 @@ string topic = fileContent.team_a_name + string("_") + fileContent.team_b_name;
 std::vector<std::string> eventframes;
 for (size_t i = 0; i < fileContent.events.size(); i++)
 {
-eventframes.push_back(createEventFrame(fileContent.events[i], topic));
+   eventframes.push_back(createEventFrame(fileContent.events[i], topic));
 }
 return sendFramestring(eventframes);
 }
 
 std::string StompProtocol::sendFramestring(std::vector<std::string> &eventframes)
 {
+   
     string str ="";
     for (const std::string& s : eventframes) {
         str += s;
+   //  std::cout << "im in line 253, str is: \n" +str << std::endl;
     }
-    //std::cout << "im in line 253, str is: \n" +str << std::endl;
 
     return str;
 }
@@ -262,17 +263,17 @@ string teamAUpdates = "";
 string teamBUpdates = "";
 
 for (auto key : event.get_game_updates())
-generalUpdates += key.first + string(":=========== ") + key.second + ";L;";
+generalUpdates += key.first + string(":=========== ") + key.second + "\n";
 for (auto key : event.get_team_a_updates())
-teamAUpdates += key.first + string(":------------- ") + key.second + ";L;";
+teamAUpdates += key.first + string(":------------- ") + key.second + "\n";
 for (auto key : event.get_team_b_updates())
-teamBUpdates += key.first + string(":+++++++++++++++ ") + key.second + ";L;";
-string frame = "SEND;F;;L;" + string("destination:/topic/") + topic + ";L;" + "receipt-id:" + std::to_string(recipt_id_counter) + ";L;" + ";F;" +
- string("user: ") + event.get_name() + ";L;" + string("team a: ") + event.get_team_a_name() + ";L;" + string("team b: ") +
- event.get_team_b_name() + ";L;" + string("event name: ") + event.get_name() +
- ";L;" + string("time: ") + std::to_string(event.get_time()) + ";L;" + string("general game updates: ") +
- generalUpdates + ";L;" + string("team a updates: ") + teamAUpdates + ";L;" + string("team b updates: ") +
- teamBUpdates + ";L;" + string("description: ") + event.get_discription() + ";L;;F;";
+teamBUpdates += key.first + string(":+++++++++++++++ ") + key.second + "\n";
+string frame = "SEND;F;" + string("destination:/topic/") + topic + ";L;" + "receipt-id:" + std::to_string(recipt_id_counter)+"\n" + ";F;" +
+ string("user: ") + event.get_name() + "\n" + string("team a: ") + event.get_team_a_name() + "\n" + string("team b: ") +
+ event.get_team_b_name() + "\n" + string("event name: ") + event.get_name() +
+ "\n" + string("time: ") + std::to_string(event.get_time()) + "\n" + string("general game updates: ") +
+ generalUpdates + "\n" + string("team a updates: ") + teamAUpdates + "\n" + string("team b updates: ") +
+ teamBUpdates + "\n" + string("description: ") + event.get_discription() + "\n"+ '\0';
 return frame;
 }
 

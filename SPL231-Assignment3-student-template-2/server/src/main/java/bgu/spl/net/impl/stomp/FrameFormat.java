@@ -70,7 +70,10 @@ public FrameFormat (String stompCmd,LinkedList<LinkedList<String>> stompHDRS,Str
 public String headerName2Value (String headerName){ //gets headerName,returns headerValue (null if not found)
     for (LinkedList<String> specificHeader : stompHeaders) {
         boolean flag = (specificHeader.get(0).equals(headerName));
-        if (flag) return specificHeader.get(1); 
+        if (flag) {
+            if(headerName=="destination") return ("/topic/"+specificHeader.get(1)); 
+            else return specificHeader.get(1);
+        }
     }
     return null;
 }
