@@ -42,6 +42,7 @@ public class ConnectionsImpl<T> implements Connections<T>{
         String msg = (String)msgT;      
         String[] splited = msg.split(";subIDmissing;");
         LinkedList<stompUser> subscribedUsers = subscriptionsDB.get(channel);
+        if (subscribedUsers==null) return;
         for (stompUser user : subscribedUsers) {
             String subId = user.userSubscriptions.get(channel); //get users subId to topic
             msg = splited[0]+subId+splited[1];      //chain it all to a new String

@@ -71,7 +71,7 @@ public String headerName2Value (String headerName){ //gets headerName,returns he
     for (LinkedList<String> specificHeader : stompHeaders) {
         boolean flag = (specificHeader.get(0).equals(headerName));
         if (flag) {
-            if(headerName=="destination") return ("/topic/"+specificHeader.get(1)); 
+            if(headerName=="destination") return (specificHeader.get(1)); //"/topic/"+
             else return specificHeader.get(1);
         }
     }

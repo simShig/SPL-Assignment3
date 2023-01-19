@@ -268,7 +268,7 @@ private FrameFormat sendCMD (FrameFormat recievedFrame, ConnectionHandler<String
     activeUser.userReportsByGame.putIfAbsent(topic, new LinkedList<String>());
     activeUser.userReportsByGame.get(topic).add(msgBody);
     //check if subscribed to the desired topic
-    if (!ConnectionsDataStructure.subscriptionsDB.get(topic).contains(activeUser)) return ErrorFrame(recievedFrame," error while SEND","couldnt fint relevant user in subscriptions");
+    // if (!ConnectionsDataStructure.subscriptionsDB.get("/topic/"+topic).contains(activeUser)) return ErrorFrame(recievedFrame," error while SEND","couldnt fint relevant user in subscriptions");
     //add publishing to newsFeed
     NewsDataStructure.publish(topic, msgBody);
 
